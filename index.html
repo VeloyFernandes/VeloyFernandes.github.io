@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Veloy Fernandes | CFD and process simulation engineer</title>
+<meta name="description" content="Veloy Fernandes is a CFD and process simulation engineer in Esbjerg, Denmark, working with OpenFOAM, Aspen Plus, DWSIM and AI tools for process design.">
+<meta property="og:title" content="Veloy Fernandes | CFD and process simulation engineer">
+<meta property="og:description" content="CFD, process simulation and AI tools for process design. Based in Esbjerg, Denmark.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #E9EFF1;
+    --paper-deep: #DCE5E8;
+    --ink: #10273A;
+    --ink-soft: #456072;
+    --cold: #2A6FB0;
+    --hot: #C4472D;
+    --line: #B9C8CE;
+    --display: "Archivo", "Arial Narrow", Arial, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration-color: var(--cold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--hot); }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--hot); outline-offset: 3px; border-radius: 2px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem; }
+
+  /* Top bar */
+  .top { position: absolute; top: 0; left: 0; right: 0; z-index: 3; }
+  .top .wrap { display: flex; justify-content: space-between; align-items: baseline; padding-top: 1.25rem; padding-bottom: 1.25rem; }
+  .top .name { white-space: nowrap; font-family: var(--display); font-weight: 700; font-stretch: 110%; text-decoration: none; }
+  .top nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .top nav a { text-decoration: none; font-weight: 500; }
+  .top nav a:hover { text-decoration: underline; text-decoration-color: var(--hot); }
+
+  /* Hero */
+  .hero { position: relative; min-height: min(92vh, 820px); display: flex; align-items: flex-end; overflow: hidden; border-bottom: 1px solid var(--line); }
+  #flow { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .hero .wrap { position: relative; z-index: 2; width: 100%; padding-top: 7rem; padding-bottom: 3.5rem; pointer-events: none; }
+  .hero a, .hero button { pointer-events: auto; }
+  h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-stretch: 122%;
+    font-size: clamp(2.6rem, 8.2vw, 6.75rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin: 0 0 1.5rem;
+    max-width: 11ch;
+  }
+  .lede { max-width: 52ch; font-size: clamp(1.05rem, 1.6vw, 1.25rem); margin: 0 0 1.75rem; background: color-mix(in srgb, var(--paper) 82%, transparent); padding: 0.25rem 0; }
+  .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 0.7rem 1.15rem; font-weight: 600; text-decoration: none;
+    border: 2px solid var(--ink); border-radius: 999px; background: var(--paper);
+  }
+  .btn.solid { background: var(--ink); color: var(--paper); }
+  .btn:hover { border-color: var(--hot); }
+  .btn.solid:hover { background: var(--hot); }
+  .hint { position: absolute; right: 1.5rem; bottom: 1rem; z-index: 2; font-size: 0.85rem; color: var(--ink-soft); margin: 0; }
+
+  /* Sections */
+  section { padding: 5rem 0; }
+  section + section { border-top: 1px solid var(--line); }
+  h2 {
+    font-family: var(--display); font-weight: 750; font-stretch: 116%;
+    font-size: clamp(1.75rem, 3.6vw, 2.75rem); line-height: 1.05; letter-spacing: -0.01em;
+    margin: 0 0 2.5rem;
+  }
+  h3 { font-family: var(--display); font-weight: 700; font-stretch: 108%; font-size: 1.4rem; line-height: 1.2; margin: 0 0 0.5rem; }
+  p { margin: 0 0 1rem; }
+
+  /* Work rows */
+  .work { list-style: none; margin: 0; padding: 0; }
+  .work li {
+    display: grid; grid-template-columns: 5px minmax(0, 1.05fr) minmax(0, 1.6fr); gap: 0 2rem;
+    padding: 2rem 0; border-top: 1px solid var(--line);
+  }
+  .work li:last-child { border-bottom: 1px solid var(--line); }
+  .work .bar { border-radius: 3px; }
+  .work .where { color: var(--ink-soft); margin: 0; }
+  .work .result { font-weight: 600; }
+  .work p:last-child { margin-bottom: 0; }
+
+  /* Scale legend, mirrors the bar colours */
+  .legend { display: flex; align-items: center; gap: 0.75rem; color: var(--ink-soft); font-size: 0.9rem; margin: -1.5rem 0 2rem; }
+  .legend span.ramp { width: 160px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #2A6FB0, #8FB3CF, #D9D2C8, #DE9A7E, #C4472D); }
+
+  /* Two columns */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+  .timeline { list-style: none; margin: 0; padding: 0; }
+  .timeline li { display: grid; grid-template-columns: 9.5rem 1fr; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
+  .timeline .when { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .timeline strong { display: block; font-weight: 600; }
+  .timeline span.org { color: var(--ink-soft); }
+
+  .tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
+  .tools ul { list-style: none; padding: 0; margin: 0; }
+  .tools li { padding: 0.45rem 0; border-top: 1px solid var(--line); }
+
+  .contact { background: var(--ink); color: var(--paper); border-top: 0; }
+  .contact h2 { max-width: 18ch; }
+  .contact p { max-width: 56ch; color: #C9D6DC; }
+  .contact .btn { background: transparent; color: var(--paper); border-color: var(--paper); }
+  .contact .btn.solid { background: var(--paper); color: var(--ink); }
+  .contact .btn:hover { border-color: #E58B73; }
+  footer { background: var(--ink); color: #9DB0BA; font-size: 0.9rem; padding: 0 0 2.5rem; }
+
+  @media (max-width: 820px) {
+    .work li { grid-template-columns: 5px 1fr; }
+    .work li > div:last-child { grid-column: 2; margin-top: 0.75rem; }
+    .cols { grid-template-columns: 1fr; gap: 3.5rem; }
+    .tools { grid-template-columns: 1fr; gap: 2rem; }
+    .timeline li { grid-template-columns: 1fr; gap: 0.15rem; }
+    .top nav { gap: 1rem; font-size: 0.95rem; }
+    .hint { display: none; }
+    section { padding: 3.5rem 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="name" href="#top">Veloy Fernandes</a>
+    <nav aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#background">Background</a>
+      <a href="#tools">Tools</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <canvas id="flow" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <h1>I turn physical models into tools.</h1>
+      <p class="lede">I'm Veloy Fernandes, a CFD and process simulation engineer in Esbjerg, Denmark. I work where fluid dynamics, process modelling and AI meet.</p>
+      <div class="actions">
+        <a class="btn solid" href="#work">See my work</a>
+        <a class="btn" href="https://www.linkedin.com/in/veloy/">LinkedIn</a>
+        <a class="btn" href="https://github.com/VeloyFernandes">GitHub</a>
+      </div>
+    </div>
+    <p class="hint">Move your pointer to move the cylinder</p>
+  </div>
+
+  <section id="work">
+    <div class="wrap">
+      <h2>Selected work</h2>
+      <p class="legend"><span>Earlier</span><span class="ramp" aria-hidden="true"></span><span>Most recent</span></p>
+      <ul class="work">
+        <li>
+          <span class="bar" style="background:#C4472D"></span>
+          <div>
+            <h3>Flowsheet Coder</h3>
+            <p class="where">Aalborg University, 2026 to now</p>
+          </div>
+          <div>
+            <p>An offline application that reads a process flowsheet drawing and turns it into a working, validated simulation in DWSIM or Aspen Plus. A fine-tuned vision-language model interprets the drawing, and the simulator checks the result.</p>
+            <p class="result">Goal: less time on manual model setup, more on design decisions for Power-to-X and renewable energy processes.</p>
+          </div>
+        </li>
+        <li>
+          <span class="bar" style="background:#DE9A7E"></span>
+          <div>
+            <h3>CFD digital twin of dry coolers</h3>
+            <p class="where">Vestas Aircoil, 2025 to 2026</p>
+          </div>
+          <div>
+            <p>An OpenFOAM 13 multi-region model of V-type dry coolers. The heat exchanger core is represented as a porous medium with fitted heat transfer correlations, and the model is calibrated against sensor data from a controlled test rig.</p>
+            <p class="result">Result: matched manufacturer rating data to within 10%.</p>
+          </div>
+        </li>
+        <li>
+          <span class="bar" style="background:#D9D2C8"></span>
+          <div>
+            <h3>Green methanol from biogas CO₂</h3>
+            <p class="where">Aalborg University, 2025</p>
+          </div>
+          <div>
+            <p>An Aspen Plus model of a Power-to-X plant that converts biogas-derived CO₂ and electrolytic hydrogen into methanol, with a Python model of the wind and solar supply for a Danish site, a levelised cost of methanol and a life cycle assessment.</p>
+            <p class="result">Result: the route is technically feasible, and renewable intermittency is the main challenge. <a href="https://github.com/VeloyFernandes/Upgrading-Biogas-CO2-to-Green-Methanol-via-Wind-Solar-Powered-Alkaline-Electrolysis">Wind and solar model on GitHub</a></p>
+          </div>
+        </li>
+        <li>
+          <span class="bar" style="background:#8FB3CF"></span>
+          <div>
+            <h3>Icing on wind turbine airfoils</h3>
+            <p class="where">Aalborg University, 2024 to 2025</p>
+          </div>
+          <div>
+            <p>A study of how ice accretion degrades blade aerodynamics in cold climates, combining Ansys Fluent CFD with wind-tunnel tests on 3D-printed iced airfoil models to quantify the loss of lift and rise in drag.</p>
+            <p class="result">Awarded Best Abstract &amp; Presentation at CES 2024.</p>
+          </div>
+        </li>
+        <li>
+          <span class="bar" style="background:#2A6FB0"></span>
+          <div>
+            <h3>Buckling of corrugated panels</h3>
+            <p class="where">Swansea University, 2023</p>
+          </div>
+          <div>
+            <p>Eigenvalue buckling analysis of trapezoidal and round corrugated panels in Ansys, validated against MATLAB and analytical calculations, with a comparison of how boundary conditions change the critical loads.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="background">
+    <div class="wrap cols">
+      <div>
+        <h2>Experience</h2>
+        <ul class="timeline">
+          <li><span class="when">Nov 2026 to now</span><div><strong>Research Assistant</strong><span class="org">Aalborg University, Esbjerg</span></div></li>
+          <li><span class="when">Sep 2025 to Jan 2026</span><div><strong>Research and Development Intern</strong><span class="org">Vestas Aircoil, Denmark</span></div></li>
+          <li><span class="when">Jul 2019</span><div><strong>Intern</strong><span class="org">IMECO Machines, Pune</span></div></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Education</h2>
+        <ul class="timeline">
+          <li><span class="when">2024 to 2026</span><div><strong>MSc Sustainable Energy Engineering</strong><span class="org">Fluids and Process Systems, Aalborg University</span></div></li>
+          <li><span class="when">2022 to 2023</span><div><strong>Postgraduate Diploma, Aerospace Engineering</strong><span class="org">Swansea University</span></div></li>
+          <li><span class="when">Before 2022</span><div><strong>BE Mechanical Engineering</strong><span class="org">Agnel Institute of Technology and Design, Goa University</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="tools">
+    <div class="wrap">
+      <h2>Tools I work with</h2>
+      <div class="tools">
+        <div>
+          <h3>Fluids and heat transfer</h3>
+          <ul><li>OpenFOAM</li><li>Ansys Fluent</li><li>ParaView</li><li>Wind-tunnel testing</li></ul>
+        </div>
+        <div>
+          <h3>Process simulation</h3>
+          <ul><li>Aspen Plus</li><li>DWSIM</li><li>Life cycle assessment</li><li>Techno-economic analysis</li></ul>
+        </div>
+        <div>
+          <h3>Code and AI</h3>
+          <ul><li>Python</li><li>MATLAB</li><li>LoRA fine-tuning of language and vision models</li><li>High-performance computing</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="wrap">
+      <h2>Open to CFD, thermal and process engineering roles.</h2>
+      <p>I'm based in Esbjerg and open to roles in Denmark and across Europe. The quickest way to reach me is a message on LinkedIn.</p>
+      <div class="actions">
+        <a class="btn solid" href="https://www.linkedin.com/in/veloy/">Message me on LinkedIn</a>
+        <a class="btn" href="https://github.com/VeloyFernandes">See my code on GitHub</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Veloy Fernandes, Esbjerg, Denmark. The background at the top is potential flow around a cylinder, coloured by local speed.</div>
+</footer>
+
+<script>
+(function () {
+  var canvas = document.getElementById('flow');
+  var ctx = canvas.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 0, H = 0, dpr = 1, a = 60;
+  var cyl = { x: 0, y: 0, tx: 0, ty: 0 };
+  var parts = [];
+  var stops = [[42,111,176],[143,179,207],[217,210,200],[222,154,126],[196,71,45]];
+
+  function colour(s) { // s: speed relative to free stream, 0..2
+    var t = Math.max(0, Math.min(1, s / 2)) * (stops.length - 1);
+    var i = Math.min(stops.length - 2, Math.floor(t)), f = t - i;
+    var c0 = stops[i], c1 = stops[i + 1];
+    return 'rgb(' + Math.round(c0[0] + (c1[0] - c0[0]) * f) + ',' + Math.round(c0[1] + (c1[1] - c0[1]) * f) + ',' + Math.round(c0[2] + (c1[2] - c0[2]) * f) + ')';
+  }
+  function vel(x, y) { // uniform flow past a cylinder of radius a at cyl
+    var dx = x - cyl.x, dy = y - cyl.y, r2 = dx * dx + dy * dy;
+    if (r2 < a * a) return null;
+    var r4 = r2 * r2, a2 = a * a;
+    return [1 - a2 * (dx * dx - dy * dy) / r4, -2 * a2 * dx * dy / r4];
+  }
+  function spawn(p, anywhere) {
+    p.x = anywhere ? Math.random() * W : -10;
+    p.y = Math.random() * H;
+    p.life = 200 + Math.random() * 400;
+  }
+  function resize() {
+    var r = canvas.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    a = Math.max(38, Math.min(W, H) * 0.11);
+    cyl.x = cyl.tx = W * (W > 820 ? 0.72 : 0.7);
+    cyl.y = cyl.ty = H * (W > 820 ? 0.42 : 0.24);
+    var n = Math.round(Math.min(900, W * H / 1500));
+    parts = [];
+    for (var i = 0; i < n; i++) { var p = {}; spawn(p, true); parts.push(p); }
+    ctx.fillStyle = '#E9EFF1'; ctx.fillRect(0, 0, W, H);
+    if (reduce) drawStatic();
+  }
+  function drawCylinder() {
+    ctx.beginPath(); ctx.arc(cyl.x, cyl.y, a - 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#10273A'; ctx.fill();
+  }
+  function drawStatic() { // streamlines traced once, no animation
+    ctx.lineWidth = 1.4;
+    for (var y0 = 12; y0 < H; y0 += 22) {
+      var x = 0, y = y0;
+      for (var k = 0; k < W / 3; k++) {
+        var v = vel(x, y); if (!v) break;
+        var nx = x + v[0] * 3, ny = y + v[1] * 3;
+        ctx.strokeStyle = colour(Math.hypot(v[0], v[1]));
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke();
+        x = nx; y = ny; if (x > W) break;
+      }
+    }
+    drawCylinder();
+  }
+  function frame() {
+    cyl.x += (cyl.tx - cyl.x) * 0.06; cyl.y += (cyl.ty - cyl.y) * 0.06;
+    ctx.fillStyle = 'rgba(233,239,241,0.07)'; ctx.fillRect(0, 0, W, H);
+    ctx.lineWidth = 1.3; ctx.lineCap = 'round';
+    var step = 1.7;
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i], v = vel(p.x, p.y);
+      if (!v || p.x > W + 10 || p.life-- < 0) { spawn(p, false); continue; }
+      var nx = p.x + v[0] * step, ny = p.y + v[1] * step;
+      ctx.strokeStyle = colour(Math.hypot(v[0], v[1]));
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(nx, ny); ctx.stroke();
+      p.x = nx; p.y = ny;
+    }
+    drawCylinder();
+    requestAnimationFrame(frame);
+  }
+  var hero = canvas.parentElement;
+  hero.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'touch') return;
+    var r = canvas.getBoundingClientRect();
+    cyl.tx = e.clientX - r.left; cyl.ty = e.clientY - r.top;
+  });
+  window.addEventListener('resize', resize);
+  resize();
+  if (!reduce) requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
