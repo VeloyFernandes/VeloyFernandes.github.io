@@ -18,10 +18,6 @@
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="text">
-  <h1>CFD, process simulation<br>and AI for engineering</h1>
-  <p>OpenFOAM, Aspen Plus, DWSIM &nbsp;|&nbsp; veloyfernandes.github.io</p>
-</div>
 <script>
 (function () {
   var c = document.getElementById('c'), ctx = c.getContext('2d');
@@ -35,7 +31,7 @@
     var dpr = Math.max(2, window.devicePixelRatio || 1), W = innerWidth, H = innerHeight;
     c.width = W * dpr; c.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#10273A'; ctx.fillRect(0, 0, W, H);
-    var cx = W * 0.84, cy = H * 0.5, a = W * 0.052, a2 = a * a;
+    var cx = W * 0.66, cy = H * 0.5, a = W * 0.06, a2 = a * a;
     ctx.lineWidth = Math.max(1, W / 1100); ctx.lineCap = "round"; ctx.globalAlpha = 0.6;
     var gap = W / 150, step = 2;
     for (var y0 = gap / 2; y0 < H; y0 += gap) {
