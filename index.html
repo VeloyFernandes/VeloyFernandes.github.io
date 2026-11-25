@@ -56,11 +56,11 @@
     font-family: var(--display);
     font-weight: 800;
     font-stretch: 122%;
-    font-size: clamp(2.6rem, 8.2vw, 6.75rem);
+    font-size: clamp(2.3rem, 7vw, 6rem);
     line-height: 0.95;
     letter-spacing: -0.02em;
     margin: 0 0 1.5rem;
-    max-width: 11ch;
+    max-width: 7em;
   }
   .lede { max-width: 52ch; font-size: clamp(1.05rem, 1.6vw, 1.25rem); margin: 0 0 1.75rem; background: color-mix(in srgb, var(--paper) 82%, transparent); padding: 0.25rem 0; }
   .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
@@ -315,7 +315,7 @@
     canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     a = Math.max(38, Math.min(W, H) * 0.11);
-    cyl.x = cyl.tx = W * (W > 820 ? 0.72 : 0.7);
+    cyl.x = cyl.tx = W * (W > 820 ? 0.78 : 0.72);
     cyl.y = cyl.ty = H * (W > 820 ? 0.42 : 0.24);
     var n = Math.round(Math.min(900, W * H / 1500));
     parts = [];
