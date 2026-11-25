@@ -388,7 +388,7 @@
 </main>
 
 <footer>
-  <div class="wrap">Veloy Fernandes, Esbjerg, Denmark. The background at the top is flow around a NACA 2412 airfoil, solved with a panel method and coloured by local speed.</div>
+  <div class="wrap">Veloy Fernandes, Esbjerg, Denmark. The background at the top is flow around a NACA 2412 airfoil, solved with a panel method and coloured by local speed. When you visit, I get a short email saying where the visit came from (such as linkedin.com) and whether it was a phone or a computer; nothing that identifies you is sent.</div>
 </footer>
 
 <script>
@@ -658,6 +658,37 @@
     $('cammore').addEventListener('click', function () { n = Math.min(16, n + 1); update(); });
     update();
   })();
+})();
+</script>
+<script>
+/* Visit notification: one short email per visitor per day, with no personal data.
+   Sent to the same inbox as the contact form. */
+(function () {
+  try {
+    if (/[?&]me=1/.test(location.search)) localStorage.setItem('skipVisitPing', '1');
+    if (localStorage.getItem('skipVisitPing') === '1') return;
+    if (location.hostname !== 'veloyfernandes.github.io') return;
+    if (navigator.webdriver || /bot|crawl|spider|preview|headless|facebookexternalhit|linkedinbot|slackbot|whatsapp|telegram/i.test(navigator.userAgent)) return;
+    var today = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem('visitPinged') === today) return;
+    localStorage.setItem('visitPinged', today);
+  } catch (e) { /* storage blocked: still send */ }
+  var form = document.querySelector('form.msg');
+  if (!form) return;
+  var endpoint = form.getAttribute('action').replace('formsubmit.co/', 'formsubmit.co/ajax/');
+  var from = 'Typed the address or used a bookmark';
+  try { if (document.referrer) from = new URL(document.referrer).hostname; } catch (e) {}
+  fetch(endpoint, {
+    method: 'POST', keepalive: true,
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      _subject: 'Someone visited your portfolio',
+      _template: 'table',
+      came_from: from,
+      device: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'Phone' : 'Computer',
+      time_utc: new Date().toUTCString()
+    })
+  }).catch(function () {});
 })();
 </script>
 </body>
