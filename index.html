@@ -8,10 +8,11 @@
 <meta property="og:title" content="Veloy Fernandes | CFD and process simulation engineer">
 <meta property="og:description" content="CFD, process simulation and AI tools for process design. Based in Esbjerg, Denmark.">
 <meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  @font-face { font-family: "Archivo"; src: url("fonts/archivo.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
+  @font-face { font-family: "IBM Plex Sans"; src: url("fonts/plex-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "IBM Plex Sans"; src: url("fonts/plex-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: "IBM Plex Sans"; src: url("fonts/plex-600.woff2") format("woff2"); font-weight: 600; font-display: swap; }
   :root {
     --paper: #E9EFF1;
     --paper-deep: #DCE5E8;
@@ -155,7 +156,8 @@
   .contact .btn { background: transparent; color: #E9EFF1; border-color: #E9EFF1; }
   .contact .btn.solid { background: #E9EFF1; color: #10273A; }
   .contact .btn:hover { border-color: #E58B73; }
-  .msg { max-width: 640px; margin-top: 2rem; }
+  .msg { max-width: 640px; margin-top: 1rem; }
+  .contact p.formnote { font-size: 0.85rem; color: #9DB0BA; margin-top: 1.5rem; }
   .msg .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   .msg label { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 1rem; }
   .msg input[type=text], .msg input[type=email], .msg textarea {
@@ -367,6 +369,7 @@
       <h2>Open to CFD, thermal and process engineering roles.</h2>
       <p>I'm based in Esbjerg and open to roles in Denmark and across Europe. Send me a message here and it will reach my inbox.</p>
       <p id="sent" class="sent" role="status" hidden>Message sent. Thank you, I'll reply by email.</p>
+      <p class="formnote">Messages are delivered to my inbox by FormSubmit, which receives what you type here. This site uses no cookies or tracking.</p>
       <form class="msg" action="https://formsubmit.co/veloyf@gmail.com" method="POST">
         <input type="hidden" name="_subject" value="New message from veloyfernandes.github.io">
         <input type="hidden" name="_next" value="https://veloyfernandes.github.io/?sent=1#contact">
@@ -388,7 +391,7 @@
 </main>
 
 <footer>
-  <div class="wrap">Veloy Fernandes, Esbjerg, Denmark. The background at the top is flow around a NACA 2412 airfoil, solved with a panel method and coloured by local speed. When you visit, I get a short email saying where the visit came from (such as linkedin.com) and whether it was a phone or a computer; nothing that identifies you is sent.</div>
+  <div class="wrap">Veloy Fernandes, Esbjerg, Denmark. The background at the top is flow around a NACA 2412 airfoil, solved with a panel method and coloured by local speed.</div>
 </footer>
 
 <script>
@@ -658,37 +661,6 @@
     $('cammore').addEventListener('click', function () { n = Math.min(16, n + 1); update(); });
     update();
   })();
-})();
-</script>
-<script>
-/* Visit notification: one short email per visitor per day, with no personal data.
-   Sent to the same inbox as the contact form. */
-(function () {
-  try {
-    if (/[?&]me=1/.test(location.search)) localStorage.setItem('skipVisitPing', '1');
-    if (localStorage.getItem('skipVisitPing') === '1') return;
-    if (location.hostname !== 'veloyfernandes.github.io') return;
-    if (navigator.webdriver || /bot|crawl|spider|preview|headless|facebookexternalhit|linkedinbot|slackbot|whatsapp|telegram/i.test(navigator.userAgent)) return;
-    var today = new Date().toISOString().slice(0, 10);
-    if (localStorage.getItem('visitPinged') === today) return;
-    localStorage.setItem('visitPinged', today);
-  } catch (e) { /* storage blocked: still send */ }
-  var form = document.querySelector('form.msg');
-  if (!form) return;
-  var endpoint = form.getAttribute('action').replace('formsubmit.co/', 'formsubmit.co/ajax/');
-  var from = 'Typed the address or used a bookmark';
-  try { if (document.referrer) from = new URL(document.referrer).hostname; } catch (e) {}
-  fetch(endpoint, {
-    method: 'POST', keepalive: true,
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({
-      _subject: 'Someone visited your portfolio',
-      _template: 'table',
-      came_from: from,
-      device: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'Phone' : 'Computer',
-      time_utc: new Date().toUTCString()
-    })
-  }).catch(function () {});
 })();
 </script>
 </body>
