@@ -90,14 +90,34 @@
 
   /* Work rows */
   .work { list-style: none; margin: 0; padding: 0; }
-  .work li {
-    display: grid; grid-template-columns: 5px 150px minmax(0, 1fr) minmax(0, 1.6fr); gap: 0 2rem; align-items: start;
+  .work > li {
+    display: grid; grid-template-columns: 5px minmax(0, 1fr) minmax(0, 1fr); gap: 0 2.25rem; align-items: start;
     padding: 2rem 0; border-top: 1px solid var(--line);
   }
-  .work li:last-child { border-bottom: 1px solid var(--line); }
+  .work > li:last-child { border-bottom: 1px solid var(--line); }
   .work .bar { border-radius: 3px; align-self: stretch; }
-  .work figure { margin: 0; }
-  .work figure svg { display: block; width: 100%; height: auto; }
+  .work .info .where { margin-bottom: 0.9rem; }
+  .demo { background: var(--paper-deep); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1rem 0.85rem; }
+  .demo svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .demo .ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.8rem; margin-top: 0.7rem; font-size: 0.92rem; }
+  .demo label { font-weight: 600; }
+  .demo input[type=range] { flex: 1; min-width: 110px; accent-color: var(--hot); }
+  .demo input[type=checkbox] { accent-color: var(--hot); width: 1rem; height: 1rem; vertical-align: -2px; }
+  .demo output { font-variant-numeric: tabular-nums; }
+  .demo .note { color: var(--ink-soft); font-size: 0.82rem; line-height: 1.45; margin: 0.7rem 0 0; }
+  .demo .note strong { color: var(--ink); }
+  .demo button { font: inherit; color: inherit; cursor: pointer; }
+  .fs-units { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .fs-units button { background: var(--paper); border: 2px dashed var(--ink); border-radius: 6px; padding: 0.55rem 0.8rem; font-weight: 600; }
+  .fs-units button.on { border-style: solid; border-color: var(--hot); }
+  .fs-code { list-style: none; margin: 0.8rem 0 0; padding: 0.7rem 0.8rem; background: var(--ink); color: #C9D6DC; border-radius: 6px; font: 0.82rem/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .fs-code li { padding: 0 0.4rem; border-radius: 3px; }
+  .fs-code li.on { background: var(--hot); color: #fff; }
+  .cam-grid { display: grid; gap: 5px; aspect-ratio: 16 / 9; }
+  .cam-grid i { background: var(--ink); border-radius: 4px; position: relative; min-height: 0; }
+  .cam-grid i::after { content: ""; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: #6FCF97; }
+  #cam .ctl button { width: 2.2rem; height: 2.2rem; border-radius: 50%; border: 2px solid var(--ink); background: var(--paper); font-weight: 700; font-size: 1.1rem; line-height: 1; }
+  #cam .ctl button:hover { border-color: var(--hot); }
   .work .where { color: var(--ink-soft); margin: 0; }
   .work .result { font-weight: 600; }
   .work p:last-child { margin-bottom: 0; }
@@ -127,11 +147,10 @@
   footer { background: var(--ink); color: #9DB0BA; font-size: 0.9rem; padding: 0 0 2.5rem; }
 
   @media (max-width: 820px) {
-    .work li { grid-template-columns: 5px 1fr; }
-    .work li > .bar { grid-row: 1 / span 3; }
-    .work li > figure, .work li > div { grid-column: 2; }
-    .work li > figure { max-width: 200px; margin-bottom: 1rem; }
-    .work li > div:last-child { margin-top: 0.75rem; }
+    .work > li { grid-template-columns: 5px 1fr; }
+    .work > li > .bar { grid-row: 1 / span 2; }
+    .work > li > div { grid-column: 2; }
+    .work > li > .demo { margin-top: 1.25rem; }
     .cols { grid-template-columns: 1fr; gap: 3.5rem; }
     .tools { grid-template-columns: 1fr; gap: 2rem; }
     .timeline li { grid-template-columns: 1fr; gap: 0.15rem; }
@@ -168,10 +187,10 @@
         <a class="btn" href="https://github.com/VeloyFernandes">GitHub</a>
       </div>
       <div class="spin">
-        <label for="spin">Spin the cylinder</label>
-        <input id="spin" type="range" min="-1.5" max="1.5" step="0.05" value="0">
-        <output id="cl" for="spin">Lift coefficient 0.00</output>
-        <span class="note">Ideal potential flow. Move your pointer to move the cylinder.</span>
+        <label for="aoa">Angle of attack</label>
+        <input id="aoa" type="range" min="-6" max="16" step="0.5" value="5">
+        <output id="cl" for="aoa"></output>
+        <span class="note">Ideal potential flow around a Joukowski airfoil, so it never stalls.</span>
       </div>
     </div>
   </div>
@@ -183,61 +202,73 @@
       <ul class="work">
         <li>
           <span class="bar" style="background:#C4472D"></span>
-          <figure><svg viewBox="0 0 200 120" role="img" aria-label="A flowsheet sketch turning into simulation code"><g fill="none" stroke="#10273A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="30" width="26" height="20" rx="2" stroke-dasharray="4 3"/><circle cx="62" cy="40" r="11" stroke-dasharray="4 3"/><rect x="30" y="78" width="30" height="18" rx="2" stroke-dasharray="4 3"/><path d="M34 40h17M62 51v14q0 13-2 13" stroke-dasharray="4 3"/><path d="M88 60h22m-7-7 7 7-7 7" stroke="#C4472D"/><rect x="122" y="18" width="70" height="84" rx="6"/></g><g fill="#10273A"><rect x="132" y="30" width="34" height="5" rx="2.5"/><rect x="140" y="42" width="42" height="5" rx="2.5" fill="#2A6FB0"/><rect x="140" y="54" width="28" height="5" rx="2.5" fill="#2A6FB0"/><rect x="132" y="66" width="38" height="5" rx="2.5"/></g><circle cx="176" cy="88" r="9" fill="#C4472D"/><path d="m171.500 88 3.200 3.400 6-6.800" fill="none" stroke="#E9EFF1" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"/></svg></figure>
-          <div>
+          <div class="info">
             <h3>Flowsheet Coder</h3>
             <p class="where">Aalborg University, 2026 to now</p>
-          </div>
-          <div>
             <p>An offline application that reads a process flowsheet drawing and turns it into a working, validated simulation in DWSIM or Aspen Plus. A fine-tuned vision-language model interprets the drawing, and the simulator checks the result.</p>
             <p class="result">Goal: less time on manual model setup, more on design decisions for Power-to-X and renewable energy processes.</p>
+          </div>
+          <div class="demo" id="fs">
+            <div class="fs-units"><button type="button" data-k="mix">Mixer</button><span aria-hidden="true">&#8594;</span><button type="button" data-k="rx">Reactor</button><span aria-hidden="true">&#8594;</span><button type="button" data-k="sep">Separator</button></div>
+            <ol class="fs-code"><li data-k="mix">add Mixer "MIX-1"</li><li data-k="rx">add Reactor "R-1"</li><li data-k="sep">add Separator "SEP-1"</li><li data-k="mix rx sep">connect MIX-1 to R-1 to SEP-1</li><li data-k="mix rx sep">solve, then check the mass balance</li></ol>
+            <p class="note">Point at a unit in the drawing to see the lines it becomes. An illustration of the idea, not the app's real output.</p>
           </div>
         </li>
         <li>
           <span class="bar" style="background:#DE9A7E"></span>
-          <figure><svg viewBox="0 0 200 120" role="img" aria-label="A V-type dry cooler with air drawn up through two coils"><defs><linearGradient id="gv" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#2A6FB0"/><stop offset="1" stop-color="#C4472D"/></linearGradient></defs><path d="M52 26 86 104h12L64 26z" fill="url(#gv)"/><path d="M148 26 114 104h-12l34-78z" fill="url(#gv)"/><g fill="none" stroke="#10273A" stroke-width="2" stroke-linecap="round"><path d="M46 26h108"/><ellipse cx="82" cy="18" rx="16" ry="5"/><ellipse cx="118" cy="18" rx="16" ry="5"/><path d="M18 70q14 0 26-8M182 70q-14 0-26-8M22 92q20 0 38-10M178 92q-20 0-38-10" stroke="#2A6FB0"/><path d="M100 78V44m-6 7 6-7 6 7" stroke="#C4472D"/></g></svg></figure>
-          <div>
+          <div class="info">
             <h3>CFD digital twin of dry coolers</h3>
             <p class="where">Vestas Aircoil, 2025 to 2026</p>
-          </div>
-          <div>
             <p>An OpenFOAM 13 multi-region model of V-type dry coolers. The heat exchanger core is represented as a porous medium with fitted heat transfer correlations, and the model is calibrated against sensor data from a controlled test rig.</p>
             <p class="result">Result: matched manufacturer rating data to within 10%.</p>
+          </div>
+          <div class="demo" id="dc">
+            <svg viewBox="0 -18 300 184" role="img" aria-label="V-type dry cooler: cool air is drawn in through two angled coils and discharged upward by fans, cooling the fluid as it runs down the coils"><defs><linearGradient id="gdc" x1="0" y1="0" x2="0" y2="1"><stop id="dc0" offset="0" stop-color="#C4472D"/><stop id="dc1" offset="1" stop-color="#2A6FB0"/></linearGradient></defs><rect x="96" y="34" width="108" height="114" fill="#E9EFF1" stroke="#10273A" stroke-width="2"/><path d="M84 148h132" stroke="#10273A" stroke-width="3" stroke-linecap="round"/><path d="M82 40h15l50 102h-15z" fill="url(#gdc)" stroke="#10273A" stroke-width="1.500" stroke-linejoin="round"/><path d="M218 40h-15l-50 102h15z" fill="url(#gdc)" stroke="#10273A" stroke-width="1.500" stroke-linejoin="round"/><g fill="#C9D5DA" stroke="#10273A" stroke-width="2"><rect x="100" y="24" width="46" height="10" rx="3"/><rect x="154" y="24" width="46" height="10" rx="3"/></g><g id="dcair" fill="none" stroke="#2A6FB0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M40 78h44m-7-6 7 6-7 6M52 112h48m-7-6 7 6-7 6M260 78h-44m7-6-7 6 7 6M248 112h-48m7-6-7 6 7 6"/></g><g id="dcup" fill="none" stroke="#C4472D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M123 18V-6m-7 8 7-8 7 8M177 18V-6m-7 8 7-8 7 8M150 112V64m-7 8 7-8 7 8"/></g><g fill="none" stroke-width="2.500" stroke-linecap="round" stroke-linejoin="round"><path d="M50 46h26m-6-5 6 5-6 5M250 46h-26m6-5-6 5 6 5" stroke="#C4472D"/><path id="dcfout" d="M126 158H98m6-5-6 5 6 5M174 158h28m-6-5 6 5-6 5" stroke="#2A6FB0"/></g><g font-family="IBM Plex Sans, Arial, sans-serif" font-size="10.500" fill="#10273A"><text x="2" y="36">Hot fluid in</text><text x="2" y="98">Cool air in</text><text x="2" y="162">Cooled fluid out</text><text x="150" y="-10" text-anchor="middle">Warm air out</text></g></svg>
+            <div class="ctl"><label for="dcfan">Fan speed</label><input id="dcfan" type="range" min="20" max="100" value="60"><output id="dcout" for="dcfan"></output></div>
+            <p class="note">Fluid enters at 45 °C, air at 25 °C. A simplified effectiveness-NTU model with example values, not the CFD results.</p>
           </div>
         </li>
         <li>
           <span class="bar" style="background:#D9D2C8"></span>
-          <figure><svg viewBox="0 0 200 120" role="img" aria-label="Solar and wind power feeding a methanol plant"><g fill="none" stroke="#10273A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="30" r="11" stroke="#C4472D"/><path d="M30 10v5M30 45v5M10 30h5M45 30h5M16 16l3.500 3.500M40.500 40.500 44 44M44 16l-3.500 3.500M19.500 40.500 16 44" stroke="#C4472D"/><path d="M52 104V62"/><path d="M52 62 52 36M52 62l22 13M52 62 30 75" stroke="#2A6FB0"/><circle cx="52" cy="62" r="3" fill="#10273A"/><path d="M84 70h28m-7-7 7 7-7 7"/><path d="M128 44q0-10 24-10t24 10v50q0 10-24 10t-24-10z"/><path d="M128 44q0 10 24 10t24-10"/></g><text x="152" y="82" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-weight="700" font-size="13" fill="#10273A">CH₃OH</text></svg></figure>
-          <div>
+          <div class="info">
             <h3>Green methanol from biogas CO₂</h3>
             <p class="where">Aalborg University, 2025</p>
-          </div>
-          <div>
             <p>An Aspen Plus model of a Power-to-X plant that converts biogas-derived CO₂ and electrolytic hydrogen into methanol, with a Python model of the wind and solar supply for a Danish site, a levelised cost of methanol and a life cycle assessment.</p>
             <p class="result">Result: the route is technically feasible, and renewable intermittency is the main challenge. <a href="https://github.com/VeloyFernandes/Upgrading-Biogas-CO2-to-Green-Methanol-via-Wind-Solar-Powered-Alkaline-Electrolysis">Wind and solar model on GitHub</a></p>
+          </div>
+          <div class="demo" id="px">
+            <svg viewBox="0 0 300 130" role="img" aria-label="Wind and solar generation over one day against plant demand"><path id="pxwind" fill="#8FB3CF"/><path id="pxsun" fill="#DE9A7E"/><path id="pxdem" fill="none" stroke="#10273A" stroke-width="2" stroke-dasharray="6 4"/><path d="M10 118h280" stroke="#10273A" stroke-width="1.500"/><g font-family="IBM Plex Sans, Arial, sans-serif" font-size="10" fill="#456072"><text x="10" y="129">00:00</text><text x="138" y="129">12:00</text><text x="264" y="129">24:00</text><text id="pxlab" x="290" y="0" text-anchor="end" fill="#10273A">Plant demand 55 MW</text></g></svg>
+            <div class="ctl"><label for="pxsol">Solar</label><input id="pxsol" type="range" min="0" max="600" step="4" value="304"><output id="pxsolo" for="pxsol"></output></div>
+            <div class="ctl"><label for="pxwt">Wind turbines</label><input id="pxwt" type="range" min="0" max="60" value="20"><output id="pxwto" for="pxwt"></output></div>
+            <p class="note"><strong id="pxcov"></strong> Starts at the project's sizing. A stylised clear summer day with steady wind at 40% of rated power; the real model uses hourly NASA POWER weather data.</p>
           </div>
         </li>
         <li>
           <span class="bar" style="background:#8FB3CF"></span>
-          <figure><svg viewBox="0 0 200 120" role="img" aria-label="An airfoil with ice built up on its leading edge"><g fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 34q40 0 60-10t128-4M6 96q40 0 62 8t126 0M6 60h22" stroke="#456072" stroke-dasharray="2 5"/><path d="M48 62q8-24 52-24 50 0 92 26-46 12-92 12-44 0-52-14z" stroke="#10273A" fill="#DCE5E8"/><path d="M50 62q-10-6-6-14 4 2 6-4 6-2 8 4-6 6-6 12 0 6 5 11-8 2-8 8-6-2-5-9z" fill="#2A6FB0" stroke="#2A6FB0" stroke-linejoin="round"/></g></svg></figure>
-          <div>
+          <div class="info">
             <h3>Icing on wind turbine airfoils</h3>
             <p class="where">Aalborg University, 2024 to 2025</p>
-          </div>
-          <div>
             <p>A study of how ice accretion degrades blade aerodynamics in cold climates, combining Ansys Fluent CFD with wind-tunnel tests on 3D-printed iced airfoil models to quantify the loss of lift and rise in drag.</p>
             <p class="result">Awarded Best Abstract &amp; Presentation at CES 2024.</p>
+          </div>
+          <div class="demo" id="ice">
+            <svg viewBox="0 0 300 130" role="img" aria-label="Airfoil with adjustable leading-edge ice, and lift and drag bars"><g fill="none" stroke-width="2" stroke-linecap="round"><path d="M10 20q50 0 74-10t206-4M10 76q50 0 78 8t202 0" stroke="#456072" stroke-dasharray="2 5"/><path d="M64 46q10-26 62-26 60 0 164 28-104 12-164 12-52 0-62-14z" stroke="#10273A" fill="#E9EFF1"/></g><path id="iceshape" d="M66 46q-12-7-7-17 5 3 7-5 8-2 10 5-7 7-7 15 0 7 6 13-10 2-10 10-7-3-6-11z" fill="#2A6FB0" stroke="#2A6FB0" stroke-width="2" stroke-linejoin="round"/><g font-family="IBM Plex Sans, Arial, sans-serif" font-size="11" fill="#10273A"><text x="10" y="103">Lift</text><text x="10" y="123">Drag</text></g><rect x="46" y="94" width="244" height="10" rx="5" fill="#C9D5DA"/><rect x="46" y="114" width="244" height="10" rx="5" fill="#C9D5DA"/><rect id="icelift" x="46" y="94" width="160" height="10" rx="5" fill="#2A6FB0"/><rect id="icedrag" x="46" y="114" width="60" height="10" rx="5" fill="#C4472D"/></svg>
+            <div class="ctl"><label for="iceamt">Ice on the leading edge</label><input id="iceamt" type="range" min="0" max="100" value="35"></div>
+            <p class="note">The direction of the effect only: more ice, less lift and more drag. The bars are not measured values.</p>
           </div>
         </li>
         <li>
           <span class="bar" style="background:#2A6FB0"></span>
-          <figure><svg viewBox="0 0 200 120" role="img" aria-label="A corrugated panel buckling under compression"><g fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M30 44h14l8-14h16l8 14h16l8-14h16l8 14h16l8-14h14" stroke="#10273A"/><path d="M30 86q35 16 70 0t70 0" stroke="#C4472D" stroke-dasharray="5 4"/><path d="M30 86h140" stroke="#456072" stroke-dasharray="1 5"/><path d="M6 60h18m-6-6 6 6-6 6M194 60h-18m6-6-6 6 6 6" stroke="#2A6FB0"/></g></svg></figure>
-          <div>
+          <div class="info">
             <h3>Buckling of corrugated panels</h3>
             <p class="where">Swansea University, 2023</p>
-          </div>
-          <div>
             <p>Eigenvalue buckling analysis of trapezoidal and round corrugated panels in Ansys, validated against MATLAB and analytical calculations, with a comparison of how boundary conditions change the critical loads.</p>
+          </div>
+          <div class="demo" id="bk">
+            <svg viewBox="0 0 300 100" role="img" aria-label="A panel edge under compression that buckles past its critical load"><g id="bksup" fill="#10273A"></g><path id="bkline" fill="none" stroke="#10273A" stroke-width="3" stroke-linecap="round"/><g fill="none" stroke="#2A6FB0" stroke-width="2.500" stroke-linecap="round" stroke-linejoin="round"><path id="bkl" d="M4 50h18m-6-6 6 6-6 6"/><path id="bkr" d="M296 50h-18m6-6-6 6 6 6"/></g></svg>
+            <div class="ctl"><label for="bkload">Load</label><input id="bkload" type="range" min="0" max="5" step="0.05" value="0.6"><output id="bkout" for="bkload"></output></div>
+            <div class="ctl"><label><input id="bkclamp" type="checkbox"> Clamp both edges</label></div>
+            <p class="note">An Euler column as a stand-in: clamping the edges raises the critical load four times. The project ran eigenvalue analysis on corrugated panels in Ansys.</p>
           </div>
         </li>
       </ul>
@@ -250,14 +281,16 @@
       <ul class="work">
         <li>
           <span class="bar" style="background:#456072"></span>
-          <figure><svg viewBox="0 0 200 120" role="img" aria-label="A two by two wall of camera feeds, one recording"><g fill="#DCE5E8" stroke="#10273A" stroke-width="2"><rect x="24" y="14" width="72" height="42" rx="4"/><rect x="104" y="14" width="72" height="42" rx="4"/><rect x="24" y="64" width="72" height="42" rx="4"/><rect x="104" y="64" width="72" height="42" rx="4"/></g><circle cx="166" cy="24" r="4" fill="#C4472D"/><g fill="none" stroke="#456072" stroke-width="2" stroke-linecap="round"><path d="M34 46l14-14 10 9 8-6 20 11M114 96l16-18 12 10 24-14"/></g></svg></figure>
-          <div>
+          <div class="info">
             <h3>Linux CCTV viewer</h3>
             <p class="where">Python and PySide6, 2026</p>
-          </div>
-          <div>
             <p>A desktop viewer that finds ONVIF cameras on the local network and shows them in a live grid, with pan-tilt-zoom controls, recording, snapshots and hardware-accelerated decoding.</p>
             <p class="result"><a href="https://github.com/VeloyFernandes/Linux_Local_CCTV_Viewer">Code on GitHub</a></p>
+          </div>
+          <div class="demo" id="cam">
+            <div class="cam-grid" id="camgrid" aria-hidden="true"></div>
+            <div class="ctl"><button type="button" id="camless" aria-label="Remove a camera">&#8722;</button><output id="camout"></output><button type="button" id="cammore" aria-label="Add a camera">+</button></div>
+            <p class="note">The camera wall rearranges itself as cameras are added, the same way the app does.</p>
           </div>
         </li>
       </ul>
@@ -318,116 +351,228 @@
 </main>
 
 <footer>
-  <div class="wrap">Veloy Fernandes, Esbjerg, Denmark. The background at the top is potential flow around a spinning cylinder, coloured by local speed.</div>
+  <div class="wrap">Veloy Fernandes, Esbjerg, Denmark. The background at the top is potential flow around a Joukowski airfoil, coloured by local speed.</div>
 </footer>
 
 <script>
 (function () {
-  var canvas = document.getElementById('flow');
-  var ctx = canvas.getContext('2d');
+  var STOPS = [[42,111,176],[143,179,207],[217,210,200],[222,154,126],[196,71,45]];
+  function ramp(t) { // 0..1 -> cold..hot
+    t = Math.max(0, Math.min(1, t)) * (STOPS.length - 1);
+    var i = Math.min(STOPS.length - 2, Math.floor(t)), f = t - i, a = STOPS[i], b = STOPS[i + 1];
+    return 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * f) + ',' + Math.round(a[1] + (b[1] - a[1]) * f) + ',' + Math.round(a[2] + (b[2] - a[2]) * f) + ')';
+  }
+  function $(id) { return document.getElementById(id); }
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var W = 0, H = 0, dpr = 1, a = 60;
-  var cyl = { x: 0, y: 0, tx: 0, ty: 0 };
-  var spin = 0, theta = 0;
-  var parts = [];
-  var stops = [[42,111,176],[143,179,207],[217,210,200],[222,154,126],[196,71,45]];
 
-  function colour(s) { // s: speed relative to free stream, 0..2
-    var t = Math.max(0, Math.min(1, s / 2)) * (stops.length - 1);
-    var i = Math.min(stops.length - 2, Math.floor(t)), f = t - i;
-    var c0 = stops[i], c1 = stops[i + 1];
-    return 'rgb(' + Math.round(c0[0] + (c1[0] - c0[0]) * f) + ',' + Math.round(c0[1] + (c1[1] - c0[1]) * f) + ',' + Math.round(c0[2] + (c1[2] - c0[2]) * f) + ')';
-  }
-  function vel(x, y) { // uniform flow past a cylinder of radius a at cyl
-    var dx = x - cyl.x, dy = y - cyl.y, r2 = dx * dx + dy * dy;
-    if (r2 < a * a) return null;
-    var r4 = r2 * r2, a2 = a * a;
-    var k = spin * a; // circulation: clockwise on screen for spin > 0
-    return [1 - a2 * (dx * dx - dy * dy) / r4 - k * dy / r2, -2 * a2 * dx * dy / r4 + k * dx / r2];
-  }
-  function spawn(p, anywhere) {
-    p.x = anywhere ? Math.random() * W : -10;
-    p.y = Math.random() * H;
-    p.life = 200 + Math.random() * 400;
-  }
-  function resize() {
-    var r = canvas.getBoundingClientRect();
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = r.width; H = r.height;
-    canvas.width = W * dpr; canvas.height = H * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    a = Math.max(38, Math.min(W, H) * 0.11);
-    cyl.x = cyl.tx = W * (W > 820 ? 0.78 : 0.72);
-    cyl.y = cyl.ty = W > 820 ? H * 0.42 : 150;
-    var n = Math.round(Math.min(900, W * H / 1500));
-    parts = [];
-    for (var i = 0; i < n; i++) { var p = {}; spawn(p, true); parts.push(p); }
-    ctx.fillStyle = '#E9EFF1'; ctx.fillRect(0, 0, W, H);
-    if (reduce) drawStatic();
-  }
-  function drawCylinder() {
-    ctx.beginPath(); ctx.arc(cyl.x, cyl.y, a - 2, 0, Math.PI * 2);
-    ctx.fillStyle = '#10273A'; ctx.fill();
-    // spin marker
-    ctx.strokeStyle = '#E9EFF1'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(cyl.x + Math.cos(theta) * a * 0.35, cyl.y + Math.sin(theta) * a * 0.35);
-    ctx.lineTo(cyl.x + Math.cos(theta) * (a - 9), cyl.y + Math.sin(theta) * (a - 9)); ctx.stroke();
-    // lift arrow (Kutta-Joukowski: lift is proportional to circulation)
-    if (Math.abs(spin) > 0.04) {
-      var dir = spin > 0 ? -1 : 1, len = a * 0.5 + Math.abs(spin) * a * 0.9, y0 = cyl.y + dir * (a + 8), y1 = y0 + dir * len;
-      ctx.strokeStyle = '#C4472D'; ctx.lineWidth = 4;
-      ctx.beginPath(); ctx.moveTo(cyl.x, y0); ctx.lineTo(cyl.x, y1);
-      ctx.moveTo(cyl.x - 9, y1 - dir * 11); ctx.lineTo(cyl.x, y1); ctx.lineTo(cyl.x + 9, y1 - dir * 11); ctx.stroke();
+  /* ---------- Hero: potential flow around a Joukowski airfoil ---------- */
+  (function () {
+    var canvas = $('flow'), ctx = canvas.getContext('2d');
+    var W = 0, H = 0, cx = 0, cy = 0, sc = 1, parts = [];
+    var mx = -0.1, my = 0.1, R = Math.hypot(1 - mx, my), beta = Math.asin(my / R);
+    var alpha = 0, ca = 1, sa = 0, G = 0, chord = 4, shape = [];
+
+    function toScreen(zx, zy) { // rotate the airfoil frame by -alpha so the stream stays horizontal
+      return [cx + sc * (zx * ca + zy * sa), cy - sc * (-zx * sa + zy * ca)];
     }
-  }
-  function drawStatic() { // streamlines traced once, no animation
-    ctx.lineWidth = 1.4;
-    for (var y0 = 12; y0 < H; y0 += 22) {
-      var x = 0, y = y0;
-      for (var k = 0; k < W / 3; k++) {
-        var v = vel(x, y); if (!v) break;
-        var nx = x + v[0] * 3, ny = y + v[1] * 3;
-        ctx.strokeStyle = colour(Math.hypot(v[0], v[1]));
-        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke();
-        x = nx; y = ny; if (x > W) break;
+    function zOf(ex, ey) { var r = ex * ex + ey * ey; return [ex + ex / r, ey - ey / r]; }
+    function toZeta(X, Y) { // inverse Joukowski, root outside the circle
+      var xr = (X - cx) / sc, yr = -(Y - cy) / sc;
+      var zx = xr * ca - yr * sa, zy = xr * sa + yr * ca;
+      var wx = zx * zx - zy * zy - 4, wy = 2 * zx * zy, m = Math.hypot(wx, wy);
+      var sx = Math.sqrt((m + wx) / 2), sy = (wy < 0 ? -1 : 1) * Math.sqrt(Math.max(0, (m - wx) / 2));
+      var ax = (zx + sx) / 2, ay = (zy + sy) / 2, bx = (zx - sx) / 2, by = (zy - sy) / 2;
+      return Math.hypot(ax - mx, ay - my) >= Math.hypot(bx - mx, by - my) ? [ax, ay] : [bx, by];
+    }
+    function field(ex, ey) { // returns d(zeta)/dt x, y and physical speed, or null inside
+      var px = ex - mx, py = ey - my, r2 = px * px + py * py;
+      if (r2 < R * R * 1.004) return null;
+      var ix = px / r2, iy = -py / r2, qx = ix * ix - iy * iy, qy = 2 * ix * iy;
+      var Wx = ca - R * R * (ca * qx - sa * qy) - G * iy;
+      var Wy = -sa - R * R * (ca * qy + sa * qx) + G * ix;
+      var a = ex * ex - ey * ey, b = 2 * ex * ey, d = a * a + b * b;
+      var dx = 1 - a / d, dy = b / d, m2 = Math.max(0.02, dx * dx + dy * dy);
+      return [Wx / m2, -Wy / m2, Math.hypot(Wx, Wy) / Math.sqrt(m2)];
+    }
+    function setAlpha(deg) {
+      alpha = deg * Math.PI / 180; ca = Math.cos(alpha); sa = Math.sin(alpha);
+      G = 2 * R * Math.sin(alpha + beta); // Kutta condition: Gamma / 2 pi
+      var lo = 1e9, hi = -1e9; shape = [];
+      for (var i = 0; i <= 140; i++) {
+        var t = i / 140 * Math.PI * 2, z = zOf(mx + R * Math.cos(t), my + R * Math.sin(t));
+        shape.push(z); lo = Math.min(lo, z[0]); hi = Math.max(hi, z[0]);
       }
+      chord = hi - lo;
+      $('cl').textContent = 'Lift coefficient ' + (8 * Math.PI * R * Math.sin(alpha + beta) / chord).toFixed(2);
+      ctx.fillStyle = '#E9EFF1'; ctx.fillRect(0, 0, W, H);
+      if (reduce) drawStatic();
     }
-    drawCylinder();
-  }
-  function frame() {
-    var px = cyl.x, py = cyl.y;
-    cyl.x += (cyl.tx - cyl.x) * 0.06; cyl.y += (cyl.ty - cyl.y) * 0.06; theta += spin * 0.06;
-    if (Math.abs(cyl.x - px) + Math.abs(cyl.y - py) > 0.2) { ctx.beginPath(); ctx.arc(px, py, a, 0, Math.PI * 2); ctx.fillStyle = '#E9EFF1'; ctx.fill(); }
-    ctx.fillStyle = 'rgba(233,239,241,0.09)'; ctx.fillRect(0, 0, W, H);
-    ctx.lineWidth = 1.3; ctx.lineCap = 'round';
-    var step = 1.7;
-    for (var i = 0; i < parts.length; i++) {
-      var p = parts[i], v = vel(p.x, p.y);
-      if (!v || p.x > W + 10 || p.life-- < 0) { spawn(p, false); continue; }
-      var nx = p.x + v[0] * step, ny = p.y + v[1] * step;
-      ctx.strokeStyle = colour(Math.hypot(v[0], v[1]));
-      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(nx, ny); ctx.stroke();
-      p.x = nx; p.y = ny;
+    function drawFoil() {
+      ctx.beginPath();
+      for (var i = 0; i < shape.length; i++) { var p = toScreen(shape[i][0], shape[i][1]); if (i) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]); }
+      ctx.closePath(); ctx.fillStyle = '#10273A'; ctx.fill();
     }
-    drawCylinder();
-    requestAnimationFrame(frame);
-  }
-  var hero = canvas.parentElement;
-  hero.addEventListener('pointermove', function (e) {
-    if (e.pointerType === 'touch') return;
-    var r = canvas.getBoundingClientRect();
-    cyl.tx = e.clientX - r.left; cyl.ty = e.clientY - r.top;
-  });
-  var spinInput = document.getElementById('spin'), cl = document.getElementById('cl');
-  spinInput.addEventListener('input', function () {
-    spin = parseFloat(spinInput.value) || 0;
-    cl.textContent = 'Lift coefficient ' + (2 * Math.PI * spin).toFixed(2);
-    if (reduce) { ctx.fillStyle = '#E9EFF1'; ctx.fillRect(0, 0, W, H); drawStatic(); }
-  });
-  hero.addEventListener('pointermove', function (e) { if (e.target.closest && e.target.closest('.spin')) e.stopPropagation(); }, true);
-  window.addEventListener('resize', resize);
-  resize();
-  if (!reduce) requestAnimationFrame(frame);
+    function spawn(p, anywhere) {
+      var X = anywhere ? Math.random() * W : -6, Y = Math.random() * H, e = toZeta(X, Y);
+      p.ex = e[0]; p.ey = e[1]; p.X = X; p.Y = Y; p.life = 250 + Math.random() * 500;
+    }
+    function advance(p, h, draw) {
+      var f = field(p.ex, p.ey); if (!f) return false;
+      var dx = f[0] * h, dy = f[1] * h, m = Math.hypot(dx, dy), cap = 4 * h;
+      if (m > cap) { dx *= cap / m; dy *= cap / m; }
+      p.ex += dx; p.ey += dy;
+      var z = zOf(p.ex, p.ey), s = toScreen(z[0], z[1]);
+      if (draw && Math.hypot(s[0] - p.X, s[1] - p.Y) < 30) {
+        ctx.strokeStyle = ramp(f[2] / 2);
+        ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(s[0], s[1]); ctx.stroke();
+      }
+      p.X = s[0]; p.Y = s[1];
+      return p.X < W + 10 && p.X > -20 && p.Y > -40 && p.Y < H + 40;
+    }
+    function drawStatic() {
+      ctx.lineWidth = 1.3;
+      for (var y0 = 10; y0 < H; y0 += 20) {
+        var e = toZeta(-6, y0), p = { ex: e[0], ey: e[1], X: -6, Y: y0 };
+        for (var k = 0; k < 2500; k++) if (!advance(p, 3 / sc, true)) break;
+      }
+      drawFoil();
+    }
+    function frame() {
+      ctx.fillStyle = 'rgba(233,239,241,0.085)'; ctx.fillRect(0, 0, W, H);
+      ctx.lineWidth = 1.3; ctx.lineCap = 'round';
+      var h = 1.7 / sc;
+      for (var i = 0; i < parts.length; i++) {
+        var p = parts[i];
+        if (p.life-- < 0 || !advance(p, h, true)) spawn(p, false);
+      }
+      drawFoil();
+      requestAnimationFrame(frame);
+    }
+    function resize() {
+      var r = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = r.width; H = r.height; canvas.width = W * dpr; canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (W > 820) { cx = W * 0.75; cy = H * 0.4; sc = W * 0.3 / 4; } else { cx = W * 0.6; cy = 150; sc = W * 0.5 / 4; }
+      parts = [];
+      var n = Math.round(Math.min(900, W * H / 1500));
+      for (var i = 0; i < n; i++) { var p = {}; spawn(p, true); parts.push(p); }
+      setAlpha(parseFloat($('aoa').value));
+    }
+    $('aoa').addEventListener('input', function () { setAlpha(parseFloat(this.value)); });
+    window.addEventListener('resize', resize);
+    resize();
+    if (!reduce) requestAnimationFrame(frame);
+  })();
+
+  /* ---------- Flowsheet Coder: unit <-> code line ---------- */
+  (function () {
+    var root = $('fs'), units = root.querySelectorAll('.fs-units button'), lines = root.querySelectorAll('.fs-code li');
+    function show(k) {
+      units.forEach(function (u) { u.classList.toggle('on', u.dataset.k === k); });
+      lines.forEach(function (l) { l.classList.toggle('on', !!k && l.dataset.k.split(' ').indexOf(k) > -1); });
+    }
+    units.forEach(function (u) {
+      ['mouseenter', 'focus', 'click'].forEach(function (ev) { u.addEventListener(ev, function () { show(u.dataset.k); }); });
+    });
+    show('rx');
+  })();
+
+  /* ---------- Dry cooler: effectiveness-NTU with example values ---------- */
+  (function () {
+    var fan = $('dcfan'), Tf = 45, Ta = 25;
+    function update() {
+      var f = fan.value / 100, Cf = 1, Cair = 2.5 * f, UA = 2.2 * Math.pow(f, 0.6);
+      var Cmin = Math.min(Cf, Cair), Cmax = Math.max(Cf, Cair), Cr = Cmin / Cmax, N = UA / Cmin;
+      var e = Math.abs(1 - Cr) < 1e-6 ? N / (1 + N) : (1 - Math.exp(-N * (1 - Cr))) / (1 - Cr * Math.exp(-N * (1 - Cr)));
+      var q = e * Cmin * (Tf - Ta), Tfo = Tf - q / Cf, Tao = Ta + q / Cair;
+      $('dc0').setAttribute('stop-color', ramp(1));
+      $('dc1').setAttribute('stop-color', ramp((Tfo - Ta) / (Tf - Ta)));
+      $('dcup').setAttribute('stroke', ramp(0.62 + 0.38 * (Tao - Ta) / (Tf - Ta)));
+      $('dcup').setAttribute('stroke-width', (1.5 + 3 * f).toFixed(1));
+      $('dcfout').setAttribute('stroke', ramp((Tfo - Ta) / (Tf - Ta)));
+      $('dcair').setAttribute('stroke-width', (1 + 2.5 * f).toFixed(1));
+      $('dcout').textContent = fan.value + '%: fluid leaves at ' + Tfo.toFixed(1) + ' °C, air at ' + Tao.toFixed(1) + ' °C';
+    }
+    fan.addEventListener('input', update); update();
+  })();
+
+  /* ---------- Power-to-X: a stylised day of supply against demand ---------- */
+  (function () {
+    var sol = $('pxsol'), wt = $('pxwt'), DEMAND = 55, x0 = 10, x1 = 290, yb = 118, yt = 14;
+    function update() {
+      var S = +sol.value, n = +wt.value, wind = n * 3 * 0.4, gen = [], peak = DEMAND * 1.3, covered = 0;
+      for (var i = 0; i <= 96; i++) {
+        var t = i / 4, s = t > 5 && t < 21 ? S * 0.75 * Math.sin(Math.PI * (t - 5) / 16) : 0;
+        gen.push(s); peak = Math.max(peak, wind + s);
+        if (i < 96 && wind + s >= DEMAND) covered += 0.25;
+      }
+      function X(i) { return x0 + (x1 - x0) * i / 96; }
+      function Y(v) { return yb - (yb - yt) * v / peak; }
+      var top = '', i;
+      for (i = 0; i <= 96; i++) top += (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(wind + gen[i]).toFixed(1);
+      $('pxsun').setAttribute('d', top + 'L' + x1 + ' ' + Y(wind).toFixed(1) + 'L' + x0 + ' ' + Y(wind).toFixed(1) + 'Z');
+      $('pxwind').setAttribute('d', 'M' + x0 + ' ' + Y(wind).toFixed(1) + 'H' + x1 + 'V' + yb + 'H' + x0 + 'Z');
+      $('pxdem').setAttribute('d', 'M' + x0 + ' ' + Y(DEMAND).toFixed(1) + 'H' + x1);
+      $('pxlab').setAttribute('y', (Y(DEMAND) - 5).toFixed(1));
+      $('pxsolo').textContent = S + ' MW';
+      $('pxwto').textContent = n + ' × 3 MW';
+      $('pxcov').textContent = 'Supply covers the plant for ' + (Math.round(covered * 2) / 2) + ' of 24 hours.';
+    }
+    sol.addEventListener('input', update); wt.addEventListener('input', update); update();
+  })();
+
+  /* ---------- Icing: qualitative trend ---------- */
+  (function () {
+    var amt = $('iceamt');
+    function update() {
+      var g = amt.value / 100, k = 0.15 + 1.25 * g;
+      $('iceshape').setAttribute('transform', 'translate(66 46) scale(' + k.toFixed(3) + ') translate(-66 -46)');
+      $('iceshape').style.opacity = g < 0.02 ? 0 : 1;
+      $('icelift').setAttribute('width', (200 * (1 - 0.4 * g)).toFixed(0));
+      $('icedrag').setAttribute('width', (50 * (1 + 2.6 * g)).toFixed(0));
+    }
+    amt.addEventListener('input', update); update();
+  })();
+
+  /* ---------- Buckling: Euler column stand-in ---------- */
+  (function () {
+    var load = $('bkload'), clamp = $('bkclamp'), xa = 34, xb = 266, y = 50;
+    function update() {
+      var P = +load.value, c = clamp.checked, Pcr = c ? 4 : 1, over = P / Pcr - 1;
+      var A = over > 0 ? 30 * Math.sqrt(Math.min(over, 1.2)) : 0, d = '';
+      for (var i = 0; i <= 60; i++) {
+        var u = i / 60, w = c ? (1 - Math.cos(2 * Math.PI * u)) / 2 : Math.sin(Math.PI * u);
+        d += (i ? 'L' : 'M') + (xa + (xb - xa) * u).toFixed(1) + ' ' + (y - A * w).toFixed(1);
+      }
+      $('bkline').setAttribute('d', d);
+      $('bkline').setAttribute('stroke', over > 0 ? '#C4472D' : '#10273A');
+      $('bksup').innerHTML = c
+        ? '<rect x="26" y="30" width="8" height="40"/><rect x="266" y="30" width="8" height="40"/>'
+        : '<path d="M34 52l-9 16h18zM266 52l-9 16h18z"/>';
+      $('bkout').textContent = P.toFixed(2) + '× of ' + Pcr + '× critical: ' + (over > 0 ? 'buckled' : 'stable');
+    }
+    load.addEventListener('input', update); clamp.addEventListener('change', update); update();
+  })();
+
+  /* ---------- CCTV viewer: grid grows with camera count ---------- */
+  (function () {
+    var n = 5, grid = $('camgrid');
+    function layout(k) { // rows, columns, as in the app
+      if (k <= 1) return [1, 1]; if (k <= 4) return [2, 2]; if (k <= 8) return [2, 4]; if (k <= 9) return [3, 3];
+      return [Math.ceil(k / 4), 4];
+    }
+    function update() {
+      var l = layout(n), html = '';
+      for (var i = 0; i < n; i++) html += '<i></i>';
+      grid.innerHTML = html;
+      grid.style.gridTemplateColumns = 'repeat(' + l[1] + ', 1fr)';
+      grid.style.gridTemplateRows = 'repeat(' + l[0] + ', 1fr)';
+      $('camout').textContent = n + (n === 1 ? ' camera' : ' cameras') + ', ' + l[0] + ' × ' + l[1] + ' grid';
+    }
+    $('camless').addEventListener('click', function () { n = Math.max(1, n - 1); update(); });
+    $('cammore').addEventListener('click', function () { n = Math.min(16, n + 1); update(); });
+    update();
+  })();
 })();
 </script>
 </body>
