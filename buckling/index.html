@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buckling of corrugated panels | Interactive simulator | Veloy Fernandes</title>
+<meta name="description" content="Interactive buckling simulator for flat, trapezoidal and round corrugated panels. A frame finite element solver and a finite strip solver run in the browser, with the corrected results of a 2023 MSc dissertation at Swansea University.">
+<meta property="og:title" content="Buckling of corrugated panels: interactive simulator">
+<meta property="og:description" content="Change the panel, the load direction and the supports, and watch the buckling load and mode shape respond.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2310273A'/%3E%3Cpath d='M4 18l4-6h4l4 6h4l4-6h4' fill='none' stroke='%23E9EFF1' stroke-width='2.500' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="name" href="../">Veloy Fernandes</a>
+    <nav aria-label="Sections">
+      <a href="#simulator">Simulator</a>
+      <a href="#direction">Direction and geometry</a>
+      <a href="#check">Dissertation check</a>
+      <a href="#corrections">Corrections</a>
+      <a href="#method">Method</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <h1>Buckling of corrugated panels</h1>
+      <p class="lede">A corrugated sheet can resist buckling tens of times better than a flat one, or worse than the flat one. It depends on which way you push. This page is my 2023 MSc dissertation at Swansea University, rebuilt as a simulator and corrected: two finite element solvers run in your browser, so every number below is computed for the panel you choose.</p>
+      <div class="actions">
+        <a class="btn solid" href="#simulator">Open the simulator</a>
+        <a class="btn" href="https://github.com/VeloyFernandes/corrugated-panel-buckling">View the code on GitHub</a>
+        <a class="btn" href="../#work">Back to my portfolio</a>
+      </div>
+    </div>
+  </div>
+
+  <section id="simulator">
+    <div class="wrap">
+      <h2>Simulator</h2>
+      <p class="intro">Pick a panel and a load direction. The view shows the first buckling mode, coloured by how far each part of the sheet moves. Drag the view to turn it.</p>
+      <div class="sim">
+        <form class="panel controls" id="controls" aria-label="Panel settings" onsubmit="return false">
+          <fieldset>
+            <legend>Panel</legend>
+            <div class="seg">
+              <label><input type="radio" name="kind" value="flat">Flat</label>
+              <label><input type="radio" name="kind" value="trapezoidal" checked>Trapezoidal</label>
+              <label><input type="radio" name="kind" value="round">Round</label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Compression</legend>
+            <div class="seg">
+              <label><input type="radio" name="dir" value="x" checked>Across corrugations</label>
+              <label><input type="radio" name="dir" value="y">Along corrugations</label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <label class="lab" for="ends">Loaded ends</label>
+            <select id="ends">
+              <option value="pinned">Pinned (free to rotate)</option>
+              <option value="fixed">Fixed (clamped)</option>
+              <option value="pinned-fixed" data-x>One pinned, one fixed</option>
+              <option value="fixed-free" data-x>One fixed, one free</option>
+            </select>
+          </fieldset>
+          <fieldset id="edgesBox" hidden>
+            <label class="lab" for="edges">Unloaded side edges</label>
+            <select id="edges">
+              <option value="supported">Held against out-of-plane movement</option>
+              <option value="free">Free</option>
+            </select>
+          </fieldset>
+          <fieldset>
+            <legend>Sheet</legend>
+            <select id="material" aria-label="Material">
+              <option value="steel">Structural steel (as in the dissertation)</option>
+              <option value="s355">High-strength steel S355</option>
+              <option value="al">Aluminium 6061-T6</option>
+              <option value="ti">Titanium Ti-6Al-4V</option>
+            </select>
+            <p class="hint" id="matnote"></p>
+          </fieldset>
+          <div id="sliders"></div>
+          <p class="hint" id="geonote" role="status"></p>
+          <button class="btn" type="button" id="reset" style="margin-top:0.9rem">Reset to the dissertation case</button>
+        </form>
+
+        <div class="stage">
+          <div class="panel view">
+            <canvas id="view" role="img" aria-label="Three-dimensional view of the panel in its first buckling mode"></canvas>
+            <div class="cap" id="viewcap"></div>
+            <div class="scale"><span>still</span><i aria-hidden="true"></i><span>moves most</span></div>
+            <div class="busy" id="busy" role="status"></div>
+          </div>
+          <div class="tiles" aria-live="polite">
+            <div class="panel tile"><div class="k">Elastic buckling load</div><div class="v" id="tNcr"></div><div class="s" id="tNcrS"></div></div>
+            <div class="panel tile"><div class="k">Against a flat plate</div><div class="v" id="tFlat"></div><div class="s" id="tFlatS"></div></div>
+            <div class="panel tile"><div class="k">What fails first</div><div class="v" id="tGov"></div><div class="s" id="tGovS"></div></div>
+            <div class="panel tile"><div class="k">Panel mass</div><div class="v" id="tMass"></div><div class="s" id="tMassS"></div></div>
+          </div>
+          <div class="panel"><p class="verdict" id="verdict" role="status"></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="direction">
+    <div class="wrap">
+      <h2>Direction and geometry</h2>
+      <p class="intro">Folding a sheet moves material away from the mid-plane, which stiffens it against bending along the folds. Across the folds the sheet can still bend like a flat strip, and there is more of it to bend, so it is softer than the flat plate it was made from. These two charts follow the panel set in the simulator.</p>
+      <div class="charts">
+        <figure class="panel">
+          <h3>Buckling load against panel length</h3>
+          <p class="sub">Elastic critical load for the chosen end supports. Dashed lines mark where the steel yields instead.</p>
+          <div id="chartLen"></div>
+          <div class="legend" id="legLen"></div>
+        </figure>
+        <figure class="panel">
+          <h3>Effect of one dimension</h3>
+          <div class="pick"><label for="sweep">Vary</label><select id="sweep"></select></div>
+          <div id="chartSweep"></div>
+          <div class="legend" id="legSweep"></div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="check">
+    <div class="wrap">
+      <h2>Dissertation check</h2>
+      <p class="intro">The twelve cases of the dissertation, a 1.016 m square panel of 6.35 mm steel, recomputed on this page when it loaded. Loads are in kN per metre of loaded edge.</p>
+      <div class="panel tablewrap">
+        <table id="checkTable">
+          <caption>Across = load across the corrugations (the dissertation's X cases). Along = load along them (the Y cases).</caption>
+          <thead><tr><th>Case</th><th>Dissertation, analytical</th><th>Corrected analytical</th><th>Solved on this page</th><th>Dissertation, Ansys</th><th class="note">Reading</th></tr></thead>
+          <tbody><tr><td colspan="6">Computing…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="corrections">
+    <div class="wrap">
+      <h2>What I corrected</h2>
+      <p class="intro">Rebuilding the work with independent solvers showed where the 2023 version was right and where it was not.</p>
+      <div class="fixes">
+        <div class="panel"><h3>The conclusion on corrugation</h3><p>The dissertation concluded that round corrugated panels resist buckling best. Its own numbers say otherwise for load across the corrugations: flat 47.1, trapezoidal 39.0, round 18.3 kN/m. Corrugation helps only along the folds, where it helps enormously.</p></div>
+        <div class="panel"><h3>Round corrugation stiffness</h3><p>The MATLAB script had an operator-precedence slip (<code>Rl/2*R</code> for <code>Rl/(2*R)</code>), used the bending term <code>D66</code> where the membrane term <code>A66</code> belongs, and fed an already wrong <code>A22</code> into <code>D22</code>. The corrected bending stiffness along a round corrugation is 4.44 MN·m, not 11.0 kN·m.</p></div>
+        <div class="panel"><h3>The Ansys results along the corrugations</h3><p>For both corrugated panels the Ansys load along the folds was identical for pinned and fixed ends, and far below the theory. A finite strip model built here from plate theory agrees with the theory instead, so those four Ansys values most likely came from a boundary condition set-up that did not act on the mode, and should not be used.</p></div>
+        <div class="panel"><h3>Yield was missing</h3><p>Along the folds the elastic buckling load of this thick panel is so high that the steel yields first. The round panel would need 36,800 kN/m to buckle but yields at 4,080 kN/m. The simulator now reports whichever limit comes first.</p></div>
+        <div class="panel"><h3>Units and data</h3><p>The loads are line loads in N/m, not forces in N. Young's modulus was printed once as 21 GPa; the calculations used the correct 210 GPa.</p></div>
+        <div class="panel"><h3>What held up</h3><p>The flat panel results, and the trapezoidal and round results across the corrugations, are confirmed here to within 0.2% of the homogenised theory. The Ansys round panel values sit 7% above, which is consistent with a coarse shell mesh on tight curves.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="method">
+    <div class="wrap">
+      <h2>Method</h2>
+      <div class="method">
+        <p><strong>Equivalent plate.</strong> The corrugated sheet is replaced by a flat orthotropic plate with the same stiffness, using the closed-form homogenisation of Xia, Friswell and Saavedra Flores (2012). This gives the bending stiffness across the folds, D&#8321;&#8321; = (c/l)·D, and along them, D&#8322;&#8322;, from the shape of one corrugation.</p>
+        <p><strong>Across the corrugations.</strong> A wide panel bends cylindrically, so a unit strip is a folded plane-strain beam. The page meshes the real profile with frame elements and solves the linear buckling eigenproblem. It does not use the equivalent plate, which makes it an independent check on it.</p>
+        <p><strong>Along the corrugations.</strong> A semi-analytical finite strip model: every flat of the profile is a plate strip with membrane and bending action, and the buckle is a sine wave along the folds. It captures local buckling of the flats and global buckling of the panel in one model. Fixed ends use the effective length, half the panel length.</p>
+        <p><strong>Yield and design load.</strong> Along the folds the section yields when the stress on the developed area reaches yield. Across them the sheet is bent by the offset of the thrust line, and first yield is reached much earlier. The design estimate combines buckling and yield with the EN 1993-1-1 column curve c, as an indication only.</p>
+        <p><strong>Limits.</strong> Linear elastic eigenvalue buckling of a perfect panel under uniform end compression. No imperfections, no post-buckling, no shear deformation, isotropic sheet. Real panels fail below the eigenvalue; that is what the design estimate hints at.</p>
+        <p><strong>Code.</strong> The same models are in Python, with tests and the corrected MATLAB script, in the <a href="https://github.com/VeloyFernandes/corrugated-panel-buckling">GitHub repository</a>. The Python and browser versions agree to four significant figures.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Veloy Fernandes. Based on “Buckling Analysis of Corrugated Panels”, MSc dissertation, Swansea University, June 2023, supervised by Dr Yuying Xia. <a href="../">Portfolio</a> · <a href="https://github.com/VeloyFernandes/corrugated-panel-buckling">Code</a></div>
+</footer>
+
+<script src="assets/model.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
