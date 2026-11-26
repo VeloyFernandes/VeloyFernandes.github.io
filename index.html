@@ -113,6 +113,10 @@
   .demo svg { display: block; width: 100%; height: auto; overflow: visible; }
   .demo .ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.8rem; margin-top: 0.7rem; font-size: 0.92rem; }
   .demo label { font-weight: 600; }
+  .golink { display: flex; flex-direction: column; gap: 0.5rem; text-decoration: none; transition: border-color 0.15s; }
+  .golink:hover { border-color: var(--hot); }
+  .golink strong { font-size: 1.1rem; }
+  .golink .go { font-weight: 600; text-decoration: underline; text-decoration-color: var(--cold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
   .demo input[type=range] { flex: 1; min-width: 110px; accent-color: var(--hot); }
   .demo input[type=checkbox] { accent-color: var(--hot); width: 1rem; height: 1rem; vertical-align: -2px; }
   .demo output { font-variant-numeric: tabular-nums; }
@@ -260,14 +264,13 @@
             <h3>Green methanol from biogas CO₂</h3>
             <p class="where">Aalborg University, 2025</p>
             <p>An Aspen Plus model of a Power-to-X plant that converts biogas-derived CO₂ and electrolytic hydrogen into methanol, with a Python model of the wind and solar supply for a Danish site, a levelised cost of methanol and a life cycle assessment.</p>
-            <p class="result">Result: the route is technically feasible, and renewable intermittency is the main challenge. <a href="green-methanol/">Open the interactive simulator</a> · <a href="https://github.com/VeloyFernandes/Upgrading-Biogas-CO2-to-Green-Methanol-via-Wind-Solar-Powered-Alkaline-Electrolysis">Wind and solar model on GitHub</a></p>
+            <p class="result">Result: the route is technically feasible, and renewable intermittency is the main challenge. <a href="https://github.com/VeloyFernandes/Upgrading-Biogas-CO2-to-Green-Methanol-via-Wind-Solar-Powered-Alkaline-Electrolysis">Wind and solar model on GitHub</a></p>
           </div>
-          <div class="demo" id="px">
-            <svg viewBox="0 0 300 130" role="img" aria-label="Wind and solar generation over one day against plant demand"><path id="pxwind" fill="#8FB3CF"/><path id="pxsun" fill="#DE9A7E"/><path id="pxdem" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><path d="M10 118h280" stroke="currentColor" stroke-width="1.500"/><g font-family="IBM Plex Sans, Arial, sans-serif" font-size="10" style="fill:var(--ink-soft)"><text x="10" y="129">00:00</text><text x="138" y="129">12:00</text><text x="264" y="129">24:00</text><text id="pxlab" x="290" y="0" text-anchor="end" fill="currentColor">Plant demand 55 MW</text></g></svg>
-            <div class="ctl"><label for="pxsol">Solar</label><input id="pxsol" type="range" min="0" max="600" step="4" value="304"><output id="pxsolo" for="pxsol"></output></div>
-            <div class="ctl"><label for="pxwt">Wind turbines</label><input id="pxwt" type="range" min="0" max="60" value="20"><output id="pxwto" for="pxwt"></output></div>
-            <p class="note"><strong id="pxcov"></strong> Starts at the project's sizing. A stylised clear summer day with steady wind at 40% of rated power; the real model uses hourly NASA POWER weather data.</p>
-          </div>
+          <a class="demo golink" id="px" href="https://veloyfernandes.github.io/green-methanol/">
+            <strong>Green methanol simulator</strong>
+            <span>Size the wind and solar supply, run the plant hour by hour and see the cost of methanol.</span>
+            <span class="go">Open the simulator &rarr;</span>
+          </a>
         </li>
         <li>
           <span class="bar" style="background:#8FB3CF"></span>
@@ -582,31 +585,6 @@
       $('dcout').textContent = fan.value + '%: fluid leaves at ' + Tfo.toFixed(1) + ' °C, air at ' + Tao.toFixed(1) + ' °C';
     }
     fan.addEventListener('input', update); update();
-  })();
-
-  /* ---------- Power-to-X: a stylised day of supply against demand ---------- */
-  (function () {
-    var sol = $('pxsol'), wt = $('pxwt'), DEMAND = 55, x0 = 10, x1 = 290, yb = 118, yt = 14;
-    function update() {
-      var S = +sol.value, n = +wt.value, wind = n * 3 * 0.4, gen = [], peak = DEMAND * 1.3, covered = 0;
-      for (var i = 0; i <= 96; i++) {
-        var t = i / 4, s = t > 5 && t < 21 ? S * 0.75 * Math.sin(Math.PI * (t - 5) / 16) : 0;
-        gen.push(s); peak = Math.max(peak, wind + s);
-        if (i < 96 && wind + s >= DEMAND) covered += 0.25;
-      }
-      function X(i) { return x0 + (x1 - x0) * i / 96; }
-      function Y(v) { return yb - (yb - yt) * v / peak; }
-      var top = '', i;
-      for (i = 0; i <= 96; i++) top += (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(wind + gen[i]).toFixed(1);
-      $('pxsun').setAttribute('d', top + 'L' + x1 + ' ' + Y(wind).toFixed(1) + 'L' + x0 + ' ' + Y(wind).toFixed(1) + 'Z');
-      $('pxwind').setAttribute('d', 'M' + x0 + ' ' + Y(wind).toFixed(1) + 'H' + x1 + 'V' + yb + 'H' + x0 + 'Z');
-      $('pxdem').setAttribute('d', 'M' + x0 + ' ' + Y(DEMAND).toFixed(1) + 'H' + x1);
-      $('pxlab').setAttribute('y', (Y(DEMAND) - 5).toFixed(1));
-      $('pxsolo').textContent = S + ' MW';
-      $('pxwto').textContent = n + ' × 3 MW';
-      $('pxcov').textContent = 'Supply covers the plant for ' + (Math.round(covered * 2) / 2) + ' of 24 hours.';
-    }
-    sol.addEventListener('input', update); wt.addEventListener('input', update); update();
   })();
 
   /* ---------- Icing: qualitative trend ---------- */
