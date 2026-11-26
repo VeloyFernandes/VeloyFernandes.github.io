@@ -8,6 +8,8 @@
 <meta property="og:title" content="Veloy Fernandes | CFD and Process Simulation Engineer">
 <meta property="og:description" content="CFD, heat transfer and process simulation. Based in Esbjerg, Denmark.">
 <meta property="og:type" content="website">
+<meta name="theme-color" content="#F3F6F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E2130" media="(prefers-color-scheme: dark)">
 <style>
   @font-face { font-family: "Archivo"; src: url("fonts/archivo.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
   @font-face { font-family: "IBM Plex Sans"; src: url("fonts/plex-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
@@ -121,14 +123,64 @@
     .facts { grid-template-columns: 1fr 1fr; }
     .tools { grid-template-columns: 1fr 1fr; }
   }
+  .menu { display: none; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  [id] { scroll-margin-top: 4.5rem; }
+
   @media (max-width: 720px) {
-    .work > li { grid-template-columns: 1fr; gap: 0.6rem; }
-    .cols { grid-template-columns: 1fr; gap: 3.5rem; }
-    .tools { grid-template-columns: 1fr; }
+    body { font-size: 1rem; }
+    /* Fixed compact header with a menu button */
+    .top { position: fixed; background: color-mix(in srgb, var(--paper) 92%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+    .top .wrap { align-items: center; padding-top: 0.6rem; padding-bottom: 0.6rem; padding-left: max(1.25rem, env(safe-area-inset-left)); padding-right: max(1.25rem, env(safe-area-inset-right)); }
+    .menu { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -10px; background: none; border: 0; color: var(--ink); cursor: pointer; }
+    .menu .bars, .menu .bars::before, .menu .bars::after { display: block; width: 22px; height: 2px; background: currentColor; border-radius: 1px; transition: transform .2s, opacity .2s; }
+    .menu .bars { position: relative; }
+    .menu .bars::before, .menu .bars::after { content: ""; position: absolute; left: 0; }
+    .menu .bars::before { top: -7px; } .menu .bars::after { top: 7px; }
+    .menu[aria-expanded="true"] .bars { background: transparent; }
+    .menu[aria-expanded="true"] .bars::before { transform: translateY(7px) rotate(45deg); }
+    .menu[aria-expanded="true"] .bars::after { transform: translateY(-7px) rotate(-45deg); }
+    .top nav { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: var(--paper); border-bottom: 1px solid var(--line); padding: 0.25rem 1.25rem 0.75rem; font-size: 1.05rem; }
+    .top nav.open { display: flex; }
+    .top nav a { padding: 0.8rem 0; border-top: 1px solid var(--line); color: var(--ink); }
+    .top nav a:first-child { border-top: 0; }
+
+    /* Hero */
+    .hero { min-height: 0; }
+    .hero .wrap { padding-top: 11.5rem; padding-bottom: 2.5rem; }
+    .eyebrow { font-size: 0.75rem; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+    h1 { font-size: clamp(2.2rem, 10.5vw, 2.8rem); }
+    .role { font-size: 1.1rem; }
+    .lede { font-size: 1rem; margin-bottom: 1.5rem; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .btn { text-align: center; padding: 0.75rem 0.75rem; min-height: 44px; }
+    .facts { gap: 1rem 1.25rem; margin-top: 2rem; padding-top: 1rem; }
+    .facts dd { font-size: 0.9rem; }
+
+    /* Sections */
+    section { padding: 3rem 0; }
+    h2 { margin-bottom: 1.5rem; }
+    h3 { font-size: 1.2rem; }
+    .work > li { grid-template-columns: 1fr; gap: 0.5rem; padding: 1.75rem 0; }
+    .work > li:last-child { border-bottom: 0; }
+    .work .meta { display: flex; gap: 0.5rem; flex-wrap: wrap; font-size: 0.85rem; }
+    .work .meta strong { display: inline; }
+    .work .meta strong::after { content: " ·"; color: var(--ink-soft); font-weight: 400; }
+    .status { margin: 0.35rem 0 0; display: table; }
+    .work .links { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .cols { grid-template-columns: 1fr; gap: 3rem; }
+    .tools { grid-template-columns: 1fr 1fr; gap: 1.75rem 1.25rem; }
+    .tools h3 { font-size: 0.98rem; }
+    .tools li { font-size: 0.88rem; line-height: 1.4; }
+
+    /* Contact */
     .msg .pair { grid-template-columns: 1fr; gap: 0; }
-    .top nav { gap: 0.9rem; justify-content: flex-end; }
-    .hero .wrap { padding-top: 12rem; }
-    section { padding: 3.5rem 0; }
+    .msg .actions { grid-template-columns: 1fr 1fr; }
+    .msg .actions button { grid-column: 1 / -1; }
+    footer .wrap { flex-direction: column; padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
+  }
+  @media (max-width: 359px) {
+    .facts, .tools { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -137,7 +189,8 @@
 <header class="top">
   <div class="wrap">
     <a class="name" href="#top">Veloy Fernandes</a>
-    <nav aria-label="Sections">
+    <button class="menu" type="button" aria-expanded="false" aria-controls="nav"><span class="sr">Menu</span><span class="bars" aria-hidden="true"></span></button>
+    <nav id="nav" aria-label="Sections">
       <a href="#work">Projects</a>
       <a href="#background">Experience</a>
       <a href="#tools">Skills</a>
@@ -322,6 +375,13 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (/[?&]sent=1/.test(location.search)) $('sent').hidden = false;
 
+  /* Mobile menu */
+  var menu = document.querySelector('.menu'), nav = $('nav');
+  function setMenu(open) { nav.classList.toggle('open', open); menu.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+  menu.addEventListener('click', function () { setMenu(!nav.classList.contains('open')); });
+  nav.addEventListener('click', function (e) { if (e.target.tagName === 'A') setMenu(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setMenu(false); });
+
   /* ---------- Hero: panel-method flow around a NACA 2412 airfoil ---------- */
   (function () {
     var canvas = $('flow'), ctx = canvas.getContext('2d');
@@ -435,24 +495,32 @@
       var step = 0.5 + 1.6 * wind / 12;
       for (var i = 0; i < parts.length; i++) { var p = parts[i]; if (p.life-- < 0 || !advance(p, step)) spawn(p, false); }
       drawFoil();
-      requestAnimationFrame(frame);
+      if (running) requestAnimationFrame(frame); else looping = false;
     }
     function resize() {
       var r = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = r.width; H = r.height; canvas.width = W * dpr; canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (W > 820) { cx = W * 0.75; cy = H * 0.36; sc = W * 0.3; } else { cx = W * 0.6; cy = 150; sc = W * 0.5; }
+      if (W > 720) { cx = W * 0.75; cy = H * 0.36; sc = W * 0.3; } else { cx = W * 0.62; cy = 125; sc = W * 0.52; }
       readTheme(); solve(ALPHA);
       parts = [];
-      var n = Math.round(Math.min(700, W * H / 1700));
+      var n = Math.round(Math.min(W > 720 ? 700 : 260, W * H / 1700));
       for (var i = 0; i < n; i++) { var p = {}; spawn(p, true); parts.push(p); }
       clear();
     }
     var mq = window.matchMedia('(prefers-color-scheme: dark)'), onScheme = function () { readTheme(); clear(); };
     if (mq.addEventListener) mq.addEventListener('change', onScheme); else if (mq.addListener) mq.addListener(onScheme);
-    window.addEventListener('resize', resize);
+    var lastW = 0, lastH = 0, running = true, looping = false;
+    function start() { if (!reduce && running && !looping) { looping = true; requestAnimationFrame(frame); } }
+    window.addEventListener('resize', function () {
+      var r = canvas.getBoundingClientRect(); // ignore the small height changes when a phone's address bar hides
+      if (r.width !== lastW || Math.abs(r.height - lastH) > 120) { lastW = r.width; lastH = r.height; resize(); }
+    });
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { running = es[0].isIntersecting; start(); }).observe(canvas);
+    document.addEventListener('visibilitychange', function () { running = !document.hidden; start(); });
+    var r0 = canvas.getBoundingClientRect(); lastW = r0.width; lastH = r0.height;
     resize();
-    if (!reduce) requestAnimationFrame(frame);
+    start();
   })();
 
 })();
