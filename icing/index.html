@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Icing on wind turbine airfoils | Interactive simulator | Veloy Fernandes</title>
+<meta name="description" content="Interactive rime icing simulator for a NACA 2412 airfoil: panel-method flow, droplet trajectories, ice growth and boundary-layer drag computed in the browser, with a re-analysis of a 2024 CFD and wind-tunnel study at Aalborg University.">
+<meta property="og:title" content="Icing on wind turbine airfoils: interactive simulator">
+<meta property="og:description" content="Set the cloud and the airfoil, and watch supercooled droplets build rime ice on the leading edge.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2310273A'/%3E%3Cpath d='M7 16c2-5 8-6 13-5 3 1 5 3 6 5-1 2-3 3-6 3-5 1-11 1-13-3z' fill='%23E9EFF1'/%3E%3Cpath d='M7 16c1-3 3-4 5-5-3 0-7 2-8 5 1 2 3 3 5 3-1-1-2-2-2-3z' fill='%235FA3DD'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="name" href="../">Veloy Fernandes</a>
+    <nav aria-label="Sections">
+      <a href="#simulator">Simulator</a>
+      <a href="#catch">Where the water lands</a>
+      <a href="#data">Measurements</a>
+      <a href="#check">Checks</a>
+      <a href="#method">Method</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <h1>Icing on wind turbine airfoils</h1>
+      <p class="lede">In a cold cloud, supercooled droplets too heavy to follow the air around a blade strike its leading edge and freeze on contact. This page grows that ice on a NACA 2412 section in your browser, from the flow field up, and re-reads the CFD and wind-tunnel results of a 2024 group project at Aalborg University that I worked on.</p>
+      <div class="actions">
+        <a class="btn solid" href="#simulator">Open the simulator</a>
+        <a class="btn" href="https://github.com/VeloyFernandes/airfoil-icing">View the code on GitHub</a>
+        <a class="btn" href="../#work">Back to my portfolio</a>
+      </div>
+    </div>
+  </div>
+
+  <section id="simulator">
+    <div class="wrap">
+      <h2>Simulator</h2>
+      <p class="intro">Set the cloud and the section. The page solves the airflow, tracks a fan of droplets through it, freezes them where they land and repeats on the new shape, six layers in all.</p>
+      <div class="sim">
+        <form class="panel controls" id="controls" aria-label="Icing conditions" onsubmit="return false">
+          <div id="sliders"></div>
+          <p class="hint" id="note" role="status"></p>
+          <button class="btn" type="button" id="reset" style="margin-top:0.9rem">Reset to the project case</button>
+        </form>
+        <div class="stage">
+          <div class="panel view">
+            <canvas id="view" role="img" aria-label="Airfoil section with droplet trajectories and the ice grown on its leading edge"></canvas>
+            <div class="cap" id="viewcap"></div>
+            <div class="key"><span style="--c:var(--cold)">droplets that hit</span><span style="--c:var(--line)">droplets that miss</span><span style="--c:#9CC6E8">ice</span></div>
+            <div class="tools"><button type="button" id="zNose" aria-pressed="true">Leading edge</button><button type="button" id="zAll" aria-pressed="false">Whole section</button></div>
+            <div class="busy" id="busy" role="status"></div>
+          </div>
+          <div class="tiles" aria-live="polite">
+            <div class="panel tile"><div class="k">Ice mass</div><div class="v" id="tMass"></div><div class="s" id="tMassS"></div></div>
+            <div class="panel tile"><div class="k">Water caught</div><div class="v" id="tE"></div><div class="s" id="tES"></div></div>
+            <div class="panel tile"><div class="k">Ice thickness</div><div class="v" id="tTh"></div><div class="s" id="tThS"></div></div>
+            <div class="panel tile"><div class="k">Drag of the section</div><div class="v" id="tCd"></div><div class="s" id="tCdS"></div></div>
+          </div>
+          <div class="panel"><p class="verdict" id="verdict" role="status"></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="catch">
+    <div class="wrap">
+      <h2>Where the water lands</h2>
+      <p class="intro">The collection efficiency is the share of the oncoming water that reaches each point of the surface. It peaks near the stagnation point and falls to zero at the impingement limits, beyond which droplets are swept past. These charts follow the simulator.</p>
+      <div class="charts">
+        <figure class="panel">
+          <h3>Collection efficiency along the surface</h3>
+          <p class="sub">Distance from the nose along the surface. Negative values are the lower side.</p>
+          <div id="chartBeta"></div>
+          <div class="legend" id="legBeta"></div>
+        </figure>
+        <figure class="panel">
+          <h3>Surface pressure</h3>
+          <p class="sub">Suction plotted upward. Ideal flow from the panel method, so separation behind the ice is not shown.</p>
+          <div id="chartCp"></div>
+          <div class="legend" id="legCp"></div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="data">
+    <div class="wrap">
+      <h2>The 2024 measurements, re-read</h2>
+      <p class="intro">The project compared Ansys Fluent simulations with tests of 3D-printed clean and iced models in the open wind tunnel at AAU Esbjerg: 9 cm chord, 25 cm span, 20 m/s. The ice shapes came from Ansys FENSAP-ICE. The lines and points below are the project's own data; the dashed line is the boundary-layer model on this page.</p>
+      <div class="charts">
+        <figure class="panel">
+          <h3>Lift coefficient</h3>
+          <div id="chartCl"></div>
+          <div class="legend" id="legCl"></div>
+        </figure>
+        <figure class="panel">
+          <h3>Drag coefficient</h3>
+          <div id="chartCdA"></div>
+          <div class="legend" id="legCd"></div>
+        </figure>
+      </div>
+      <div class="fixes" style="margin-top:1.25rem">
+        <div class="panel"><h3>The clean section: finite span, not the turbulence model</h3><p>The tunnel model measured a lift slope of 0.067 per degree where the simulation gives 0.097. The simulated domain is an extruded section with no tips. The model is a wing of aspect ratio 2.8 whose tips sit under 3 cm from the tunnel walls, and lifting-line theory puts a free wing of that shape at 0.059. The measurement lies between the two, as it should. The same tip vortices add induced drag, which the simulation has none of and which accounts for the higher measured drag at high angles.</p></div>
+        <div class="panel"><h3>Drag at zero angle: transition matters</h3><p>At a Reynolds number of 120,000 much of the boundary layer is laminar. The SST k-ω simulation treats it as turbulent from the nose and gives a drag coefficient of 0.0214. The tunnel measured 0.0139. The boundary-layer model here, which lets the flow stay laminar until it trips, gives <span id="cd0"></span>.</p></div>
+        <div class="panel"><h3>The ice penalty: simulation and tunnel disagree</h3><p>The simulation predicts a lift loss growing from 9% to 48% and a stall at 8°. The tunnel shows the opposite: 35% at 0°, then 4% and 3%, with no stall. The 0° figure rests on a lift coefficient of 0.11 against 0.16, a difference that a mounting error of 0.9° would produce, and each iced model was a separate print. The drag penalty is the firmer result: 11%, 29% and 34% in the tunnel.</p></div>
+        <div class="panel"><h3>What the project got right</h3><p>Ice lowers lift and raises drag at every angle in both data sets. The icing run itself holds up: the ice mass from FENSAP-ICE is reproduced here from first principles to within a few percent.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="check">
+    <div class="wrap">
+      <h2>Checks and corrections</h2>
+      <p class="intro">Values from the report next to values recomputed on this page when it loaded.</p>
+      <div class="panel tablewrap">
+        <table id="checkTable">
+          <thead><tr><th>Item</th><th>Report</th><th>Recomputed</th><th class="note">Reading</th></tr></thead>
+          <tbody><tr><td colspan="4">Computing…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="method">
+    <div class="wrap">
+      <h2>Method</h2>
+      <div class="method">
+        <p><strong>Flow.</strong> A Hess-Smith panel method: source panels on the surface plus one vortex strength fixed by the Kutta condition. It gives the velocity anywhere around the section, clean or iced, in milliseconds.</p>
+        <p><strong>Droplets.</strong> Each droplet is released four chords upstream and integrated through the flow with the Schiller-Naumann drag law. How far it deviates from the air depends on the inertia parameter K, which grows with droplet size and speed and falls with chord. The spacing of the droplets where they land, compared with where they started, is the collection efficiency.</p>
+        <p><strong>Ice.</strong> Rime: every droplet freezes where it lands, so the ice thickness is the water caught divided by the ice density, 917 kg/m³. The surface moves along its normal, layer by layer, with the flow and trajectories recomputed each time. The grown area is matched to the water caught, so mass is conserved.</p>
+        <p><strong>Drag.</strong> Thwaites' method for the laminar boundary layer, Michel's criterion for transition, Head's method for the turbulent part and the Squire-Young formula. On the iced section the boundary layer is tripped at the edge of the ice.</p>
+        <p><strong>Limits.</strong> The rime rule holds for cold, dry icing. Near freezing, water runs back before it freezes and forms glaze horns, which this model does not grow. The flow is ideal and the boundary layer does not feed back on it, so separation behind the ice, ice roughness and stall are not captured: the drag figure for the iced section is a lower bound. One droplet size, no gravity, two dimensions.</p>
+        <p><strong>Code.</strong> The same models are in Python with tests in the <a href="https://github.com/VeloyFernandes/airfoil-icing">GitHub repository</a>. The Python and browser versions agree to within 2%.</p>
+      </div>
+      <p class="credit" style="margin-top:1.5rem">Data from “CFD and Experimental Analysis of the Ice Accretion Effects on Wind Turbine Performance”, group FPS-1, Sustainable Energy Engineering, Aalborg University Esbjerg, December 2024: Aung Kyawo, Denizhan Arslanbek, Veloy Fernandes and Zahra Bohlooli Zanjani, supervised by Matthias Mandø. The simulator and the re-analysis on this page are my own later work and are not part of the report.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Veloy Fernandes. <a href="../">Portfolio</a> · <a href="https://github.com/VeloyFernandes/airfoil-icing">Code</a></div>
+</footer>
+
+<script src="assets/model.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
