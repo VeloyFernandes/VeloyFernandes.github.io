@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Veloy Fernandes | CFD and process simulation engineer</title>
-<meta name="description" content="Veloy Fernandes is a CFD and process simulation engineer in Esbjerg, Denmark, working with OpenFOAM, Aspen Plus, DWSIM and AI tools for process design.">
-<meta property="og:title" content="Veloy Fernandes | CFD and process simulation engineer">
-<meta property="og:description" content="CFD, process simulation and AI tools for process design. Based in Esbjerg, Denmark.">
+<title>Veloy Fernandes | CFD and Process Simulation Engineer</title>
+<meta name="description" content="Veloy Fernandes is a CFD and process simulation engineer in Esbjerg, Denmark, working with OpenFOAM, Ansys Fluent, Aspen Plus and DWSIM.">
+<meta property="og:title" content="Veloy Fernandes | CFD and Process Simulation Engineer">
+<meta property="og:description" content="CFD, heat transfer and process simulation. Based in Esbjerg, Denmark.">
 <meta property="og:type" content="website">
 <style>
   @font-face { font-family: "Archivo"; src: url("fonts/archivo.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
@@ -14,154 +14,120 @@
   @font-face { font-family: "IBM Plex Sans"; src: url("fonts/plex-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
   @font-face { font-family: "IBM Plex Sans"; src: url("fonts/plex-600.woff2") format("woff2"); font-weight: 600; font-display: swap; }
   :root {
-    --paper: #E9EFF1;
-    --paper-deep: #DCE5E8;
-    --ink: #10273A;
-    --ink-soft: #456072;
-    --cold: #2A6FB0;
-    --hot: #C4472D;
-    --line: #B9C8CE;
-    --track: #C9D5DA;
-    --deep: #10273A;
-    --tile: #10273A;
+    --paper: #F3F6F7; --paper-deep: #E6ECEE; --ink: #10273A; --ink-soft: #4A6275;
+    --accent: #2A6FB0; --hot: #C4472D; --line: #C9D5DA; --deep: #10273A;
     color-scheme: light dark;
     --display: "Archivo", "Arial Narrow", Arial, sans-serif;
     --body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --paper: #0E2130; --paper-deep: #152C3D; --ink: #E6EEF1; --ink-soft: #9DB3BF;
-      --cold: #5FA3DD; --hot: #E0694F; --line: #2C4658; --track: #2C4658; --deep: #081621; --tile: #05101A;
-    }
+    :root { --paper: #0E2130; --paper-deep: #132A3B; --ink: #E6EEF1; --ink-soft: #9DB3BF; --accent: #6AA8DE; --hot: #E0694F; --line: #2A4356; --deep: #081621; }
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--body);
-    font-size: 1.0625rem;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
-  a { color: inherit; text-decoration-color: var(--cold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.0625rem; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration-color: var(--accent); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
   a:hover { text-decoration-color: var(--hot); }
-  a:focus-visible, button:focus-visible { outline: 3px solid var(--hot); outline-offset: 3px; border-radius: 2px; }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem; }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
 
   /* Top bar */
   .top { position: absolute; top: 0; left: 0; right: 0; z-index: 3; }
-  .top .wrap { display: flex; justify-content: space-between; align-items: baseline; padding-top: 1.25rem; padding-bottom: 1.25rem; }
-  .top .name { white-space: nowrap; font-family: var(--display); font-weight: 700; font-stretch: 110%; text-decoration: none; }
-  .top nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-  .top nav a { text-decoration: none; font-weight: 500; }
-  .top nav a:hover { text-decoration: underline; text-decoration-color: var(--hot); }
+  .top .wrap { display: flex; justify-content: space-between; align-items: baseline; padding-top: 1.25rem; padding-bottom: 1.25rem; gap: 1rem; }
+  .top .name { white-space: nowrap; font-family: var(--display); font-weight: 700; text-decoration: none; letter-spacing: 0.01em; }
+  .top nav { display: flex; gap: 1.6rem; flex-wrap: wrap; font-size: 0.95rem; }
+  .top nav a { text-decoration: none; font-weight: 500; color: var(--ink-soft); }
+  .top nav a:hover { color: var(--ink); }
 
   /* Hero */
-  .hero { position: relative; min-height: min(92vh, 820px); display: flex; align-items: flex-end; overflow: hidden; border-bottom: 1px solid var(--line); }
-  #flow { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .hero { position: relative; min-height: min(86vh, 760px); display: flex; align-items: flex-end; overflow: hidden; border-bottom: 1px solid var(--line); }
+  #flow { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0.75; }
   .hero .wrap { position: relative; z-index: 2; width: 100%; padding-top: 7rem; padding-bottom: 3.5rem; pointer-events: none; }
-  .hero a, .hero button { pointer-events: auto; }
-  h1 {
-    font-family: var(--display);
-    font-weight: 800;
-    font-stretch: 122%;
-    font-size: clamp(2.3rem, 7vw, 6rem);
-    line-height: 0.95;
-    letter-spacing: -0.02em;
-    margin: 0 0 1.5rem;
-    max-width: 7em;
-  }
-  .lede { max-width: 52ch; font-size: clamp(1.05rem, 1.6vw, 1.25rem); margin: 0 0 1.75rem; background: color-mix(in srgb, var(--paper) 82%, transparent); padding: 0.25rem 0; }
+  .hero a { pointer-events: auto; }
+  .eyebrow { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin: 0 0 1rem; }
+  h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.5rem, 5.5vw, 4.25rem); line-height: 1.02; letter-spacing: -0.015em; margin: 0 0 0.6rem; }
+  .role { font-size: clamp(1.15rem, 2vw, 1.45rem); font-weight: 500; margin: 0 0 1.25rem; }
+  .lede { max-width: 58ch; color: var(--ink-soft); margin: 0 0 2rem; }
+  .hero .role, .hero .lede, .hero h1 { background: color-mix(in srgb, var(--paper) 80%, transparent); width: fit-content; }
   .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-  .btn {
-    display: inline-block; padding: 0.7rem 1.15rem; font-weight: 600; text-decoration: none;
-    border: 2px solid var(--ink); border-radius: 999px; background: var(--paper);
-  }
+  .btn { display: inline-block; padding: 0.6rem 1.1rem; font-size: 0.95rem; font-weight: 600; text-decoration: none; border: 1.5px solid var(--ink); border-radius: 4px; background: var(--paper); }
   .btn.solid { background: var(--ink); color: var(--paper); }
-  .btn:hover { border-color: var(--hot); }
-  .btn.solid:hover { background: var(--hot); color: #fff; }
-  .spin { pointer-events: auto; margin-top: 2rem; font-size: 0.95rem; max-width: 30rem; background: color-mix(in srgb, var(--paper) 85%, transparent); padding: 0.4rem 0.75rem 0.4rem 0; border-radius: 6px; }
-  .spin .row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.35rem; }
-  .spin label { font-weight: 600; width: 8.5em; flex: none; }
-  .spin input { flex: 1; min-width: 90px; accent-color: var(--hot); }
-  .spin output { font-variant-numeric: tabular-nums; width: 4.2em; flex: none; text-align: right; }
-  .spin .note { color: var(--ink-soft); font-size: 0.85rem; line-height: 1.45; margin: 0.4rem 0 0; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.solid:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin: 3rem 0 0; padding: 1.25rem 0 0; border-top: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 85%, transparent); }
+  .facts dt { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.25rem; }
+  .facts dd { margin: 0; font-size: 0.95rem; line-height: 1.45; }
 
   /* Sections */
   section { padding: 5rem 0; }
   section + section { border-top: 1px solid var(--line); }
-  h2 {
-    font-family: var(--display); font-weight: 750; font-stretch: 116%;
-    font-size: clamp(1.75rem, 3.6vw, 2.75rem); line-height: 1.05; letter-spacing: -0.01em;
-    margin: 0 0 2.5rem;
-  }
-  h3 { font-family: var(--display); font-weight: 700; font-stretch: 108%; font-size: 1.4rem; line-height: 1.2; margin: 0 0 0.5rem; }
+  .kicker { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin: 0 0 0.5rem; }
+  h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.1; margin: 0 0 2.5rem; }
+  h3 { font-family: var(--display); font-weight: 700; font-size: 1.3rem; line-height: 1.25; margin: 0 0 0.4rem; }
   p { margin: 0 0 1rem; }
 
-  /* Work rows */
+  /* Projects */
   .work { list-style: none; margin: 0; padding: 0; }
-  .work > li {
-    display: grid; grid-template-columns: 5px minmax(0, 1fr); gap: 0 2.25rem; align-items: start;
-    padding: 2rem 0; border-top: 1px solid var(--line);
-  }
+  .work > li { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 0 2.5rem; padding: 2.25rem 0; border-top: 1px solid var(--line); }
   .work > li:last-child { border-bottom: 1px solid var(--line); }
-  .work .bar { border-radius: 3px; align-self: stretch; }
-  .work .info { max-width: 70ch; }
-  .work .links { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.25rem; }
-  .work .info .where { margin-bottom: 0.9rem; }
-  .work .where { color: var(--ink-soft); margin: 0; }
-  .work .result { font-weight: 600; }
-  .work p:last-child { margin-bottom: 0; }
+  .work .meta { color: var(--ink-soft); font-size: 0.92rem; line-height: 1.5; }
+  .work .meta strong { display: block; color: var(--ink); font-weight: 600; }
+  .work .info { max-width: 68ch; }
+  .work .outcome { border-left: 3px solid var(--accent); padding-left: 0.9rem; font-weight: 500; }
+  .work .outcome b { font-weight: 600; }
+  .status { display: inline-block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 0.4rem; margin-left: 0.5rem; vertical-align: 0.2em; }
+  .tags { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 1rem 0 0; padding: 0; }
+  .tags li { font-size: 0.8rem; color: var(--ink-soft); background: var(--paper-deep); border-radius: 3px; padding: 0.15rem 0.55rem; }
+  .work .links { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1.25rem; }
 
-  /* Scale legend, mirrors the bar colours */
-  .legend { display: flex; align-items: center; gap: 0.75rem; color: var(--ink-soft); font-size: 0.9rem; margin: -1.5rem 0 2rem; }
-  .legend span.ramp { width: 160px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #2A6FB0, #8FB3CF, #D9D2C8, #DE9A7E, #C4472D); }
-
-  /* Two columns */
+  /* Experience and education */
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
   .timeline { list-style: none; margin: 0; padding: 0; }
-  .timeline li { display: grid; grid-template-columns: 9.5rem 1fr; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
-  .timeline .when { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .timeline li { padding: 1.1rem 0; border-top: 1px solid var(--line); }
+  .timeline .when { display: block; color: var(--ink-soft); font-size: 0.88rem; font-variant-numeric: tabular-nums; }
   .timeline strong { display: block; font-weight: 600; }
-  .timeline span.org { color: var(--ink-soft); }
+  .timeline .org { display: block; }
+  .timeline .desc { display: block; color: var(--ink-soft); font-size: 0.95rem; margin-top: 0.35rem; }
 
-  .tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
-  .tools ul { list-style: none; padding: 0; margin: 0; }
-  .tools li { padding: 0.45rem 0; border-top: 1px solid var(--line); }
+  /* Skills */
+  .tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+  .tools h3 { font-size: 1.05rem; }
+  .tools ul { list-style: none; padding: 0; margin: 0.75rem 0 0; }
+  .tools li { padding: 0.4rem 0; border-top: 1px solid var(--line); font-size: 0.95rem; }
 
+  /* Contact */
   .contact { background: var(--deep); color: #E9EFF1; border-top: 0; }
-  .contact h2 { max-width: 18ch; }
-  .contact p { max-width: 56ch; color: #C9D6DC; }
+  .contact .kicker { color: #8FC0EA; }
+  .contact p { max-width: 58ch; color: #C9D6DC; }
   .contact .btn { background: transparent; color: #E9EFF1; border-color: #E9EFF1; }
   .contact .btn.solid { background: #E9EFF1; color: #10273A; }
-  .contact .btn:hover { border-color: #E58B73; }
-  .msg { max-width: 640px; margin-top: 1rem; }
-  .contact p.formnote { font-size: 0.85rem; color: #9DB0BA; margin-top: 1.5rem; }
+  .contact .btn:hover { border-color: #8FC0EA; }
+  .contact .btn.solid:hover { background: #8FC0EA; color: #10273A; }
+  .msg { max-width: 640px; margin-top: 1.5rem; }
+  .contact p.formnote { font-size: 0.82rem; color: #8FA4AF; margin-top: 1.5rem; }
   .msg .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .msg label { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 1rem; }
-  .msg input[type=text], .msg input[type=email], .msg textarea {
-    display: block; width: 100%; margin-top: 0.35rem; padding: 0.7rem 0.8rem; font: inherit; font-weight: 400;
-    color: #E9EFF1; background: #1B3850; border: 1.500px solid #5B7688; border-radius: 6px;
-  }
+  .msg label { display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 1rem; }
+  .msg input[type=text], .msg input[type=email], .msg textarea { display: block; width: 100%; margin-top: 0.35rem; padding: 0.65rem 0.8rem; font: inherit; font-weight: 400; color: #E9EFF1; background: #1B3850; border: 1px solid #5B7688; border-radius: 4px; }
   .msg textarea { resize: vertical; }
-  .msg input:focus-visible, .msg textarea:focus-visible { outline: 3px solid #E58B73; outline-offset: 1px; border-color: transparent; }
+  .msg input:focus-visible, .msg textarea:focus-visible { outline: 2px solid #8FC0EA; outline-offset: 1px; border-color: transparent; }
   .msg .hp { position: absolute; left: -9999px; }
-  .msg button.btn { font: inherit; font-weight: 600; cursor: pointer; }
+  .msg button.btn { font: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
   .msg .actions { margin-top: 0.5rem; }
-  .sent { background: #1F5A44; color: #fff; padding: 0.8rem 1rem; border-radius: 6px; max-width: 640px; font-weight: 600; }
-  @media (max-width: 820px) { .msg .pair { grid-template-columns: 1fr; gap: 0; } }
-  footer { background: var(--deep); color: #9DB0BA; font-size: 0.9rem; padding: 0 0 2.5rem; }
+  .sent { background: #1F5A44; color: #fff; padding: 0.8rem 1rem; border-radius: 4px; max-width: 640px; font-weight: 600; }
+  footer { background: var(--deep); color: #8FA4AF; font-size: 0.85rem; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 2rem; padding-top: 1.5rem; padding-bottom: 2.5rem; border-top: 1px solid #23405A; }
 
-  @media (max-width: 820px) {
-    .work > li { grid-template-columns: 5px 1fr; }
+  @media (max-width: 900px) {
+    .facts { grid-template-columns: 1fr 1fr; }
+    .tools { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 720px) {
+    .work > li { grid-template-columns: 1fr; gap: 0.6rem; }
     .cols { grid-template-columns: 1fr; gap: 3.5rem; }
-    .tools { grid-template-columns: 1fr; gap: 2rem; }
-    .timeline li { grid-template-columns: 1fr; gap: 0.15rem; }
-    .top nav { gap: 0.9rem; font-size: 0.95rem; justify-content: flex-end; }
-    .top .wrap { gap: 1rem; }
-    .hero .wrap { padding-top: 14rem; }
+    .tools { grid-template-columns: 1fr; }
+    .msg .pair { grid-template-columns: 1fr; gap: 0; }
+    .top nav { gap: 0.9rem; justify-content: flex-end; }
+    .hero .wrap { padding-top: 12rem; }
     section { padding: 3.5rem 0; }
   }
 </style>
@@ -172,9 +138,9 @@
   <div class="wrap">
     <a class="name" href="#top">Veloy Fernandes</a>
     <nav aria-label="Sections">
-      <a href="#work">Work</a>
-      <a href="#background">Background</a>
-      <a href="#tools">Tools</a>
+      <a href="#work">Projects</a>
+      <a href="#background">Experience</a>
+      <a href="#tools">Skills</a>
       <a href="#contact">Contact</a>
     </nav>
   </div>
@@ -184,71 +150,75 @@
   <div class="hero">
     <canvas id="flow" aria-hidden="true"></canvas>
     <div class="wrap">
-      <h1>I turn physical models into tools.</h1>
-      <p class="lede">I'm Veloy Fernandes, a CFD and process simulation engineer in Esbjerg, Denmark. I work where fluid dynamics, process modelling and AI meet.</p>
+      <p class="eyebrow">CFD · Heat transfer · Process simulation</p>
+      <h1>Veloy Fernandes</h1>
+      <p class="role">CFD and Process Simulation Engineer, Esbjerg, Denmark</p>
+      <p class="lede">I build and validate simulation models of thermal and fluid systems, from multi-region OpenFOAM models of industrial heat exchangers to Aspen Plus models of Power-to-X plants, and I develop AI tools that speed up process modelling.</p>
       <div class="actions">
-        <a class="btn solid" href="#work">See my work</a>
+        <a class="btn solid" href="#work">View projects</a>
+        <a class="btn" href="#contact">Get in touch</a>
         <a class="btn" href="https://www.linkedin.com/in/veloy/">LinkedIn</a>
         <a class="btn" href="https://github.com/VeloyFernandes">GitHub</a>
       </div>
-      <div class="spin">
-        <div class="row"><label for="aoa">Angle of attack</label><input id="aoa" type="range" min="-6" max="14" step="0.5" value="5"><output id="aoao" for="aoa"></output></div>
-        <div class="row"><label for="wind">Wind speed</label><input id="wind" type="range" min="2" max="30" step="1" value="12"><output id="windo" for="wind"></output></div>
-        <p class="note" id="cl" role="status"></p>
-      </div>
+      <dl class="facts">
+        <div><dt>Current role</dt><dd>Research Assistant, Aalborg University</dd></div>
+        <div><dt>Education</dt><dd>MSc Sustainable Energy Engineering, Aalborg University</dd></div>
+        <div><dt>Core tools</dt><dd>OpenFOAM, Ansys Fluent, Aspen Plus, DWSIM, Python</dd></div>
+        <div><dt>Availability</dt><dd>Open to roles in Denmark and Europe</dd></div>
+      </dl>
     </div>
   </div>
 
   <section id="work">
     <div class="wrap">
-      <h2>Selected work</h2>
-      <p class="legend"><span>Earlier</span><span class="ramp" aria-hidden="true"></span><span>Most recent</span></p>
+      <p class="kicker">Portfolio</p>
+      <h2>Selected projects</h2>
       <ul class="work">
         <li>
-          <span class="bar" style="background:#C4472D"></span>
+          <div class="meta"><strong>Aalborg University</strong>2026 – present</div>
           <div class="info">
-            <h3>Flowsheet Coder</h3>
-            <p class="where">Aalborg University, 2026 to now</p>
-            <p>An offline application that reads a process flowsheet drawing and turns it into a working, validated simulation in DWSIM or Aspen Plus. A fine-tuned vision-language model interprets the drawing, and the simulator checks the result.</p>
-            <p class="result">Goal: less time on manual model setup, more on design decisions for Power-to-X and renewable energy processes.</p>
+            <h3>Flowsheet Coder<span class="status">In development</span></h3>
+            <p>An offline application that reads a process flowsheet drawing and generates a working, validated simulation in DWSIM or Aspen Plus. A fine-tuned vision-language model interprets the drawing, and the simulator verifies the result.</p>
+            <p class="outcome"><b>Aim:</b> reduce manual model set-up time so engineers can focus on design decisions for Power-to-X and renewable energy processes.</p>
+            <ul class="tags"><li>Vision-language models</li><li>LoRA fine-tuning</li><li>DWSIM</li><li>Aspen Plus</li><li>Python</li></ul>
           </div>
         </li>
         <li>
-          <span class="bar" style="background:#DE9A7E"></span>
+          <div class="meta"><strong>Vestas Aircoil</strong>2025 – 2026</div>
           <div class="info">
-            <h3>CFD digital twin of dry coolers</h3>
-            <p class="where">Vestas Aircoil, 2025 to 2026</p>
-            <p>An OpenFOAM 13 multi-region model of V-type dry coolers. The heat exchanger core is represented as a porous medium with fitted heat transfer correlations, and the model is calibrated against sensor data from a controlled test rig.</p>
-            <p class="result">Result: matched manufacturer rating data to within 10%.</p>
+            <h3>CFD digital twin of V-type dry coolers</h3>
+            <p>A multi-region OpenFOAM 13 model of V-type dry coolers. The heat exchanger core is represented as a porous medium with fitted heat transfer correlations, and the model is calibrated against sensor data from a controlled test rig.</p>
+            <p class="outcome"><b>Outcome:</b> agreement with manufacturer rating data to within 10%.</p>
+            <ul class="tags"><li>OpenFOAM 13</li><li>Conjugate heat transfer</li><li>Porous media</li><li>Model calibration</li></ul>
           </div>
         </li>
         <li>
-          <span class="bar" style="background:#D9D2C8"></span>
+          <div class="meta"><strong>Aalborg University</strong>2025</div>
           <div class="info">
             <h3>Green methanol from biogas CO₂</h3>
-            <p class="where">Aalborg University, 2025</p>
-            <p>An Aspen Plus model of a Power-to-X plant that converts biogas-derived CO₂ and electrolytic hydrogen into methanol, with a Python model of the wind and solar supply for a Danish site, a levelised cost of methanol and a life cycle assessment.</p>
-            <p class="result">Result: the route is technically feasible, and renewable intermittency is the main challenge.</p>
-            <div class="links"><a class="btn solid" href="green-methanol/">Open the demo</a><a class="btn" href="https://github.com/VeloyFernandes/Upgrading-Biogas-CO2-to-Green-Methanol-via-Wind-Solar-Powered-Alkaline-Electrolysis">View on GitHub</a></div>
+            <p>An Aspen Plus model of a Power-to-X plant converting biogas-derived CO₂ and electrolytic hydrogen into methanol, coupled with a Python model of wind and solar supply for a Danish site, a levelised cost of methanol and a life cycle assessment.</p>
+            <p class="outcome"><b>Outcome:</b> the route is technically feasible; renewable intermittency is the main constraint.</p>
+            <ul class="tags"><li>Aspen Plus</li><li>pvlib</li><li>windpowerlib</li><li>Techno-economic analysis</li><li>LCA</li></ul>
+            <div class="links"><a class="btn solid" href="green-methanol/">Interactive demo</a><a class="btn" href="https://github.com/VeloyFernandes/Upgrading-Biogas-CO2-to-Green-Methanol-via-Wind-Solar-Powered-Alkaline-Electrolysis">Source code</a></div>
           </div>
         </li>
         <li>
-          <span class="bar" style="background:#8FB3CF"></span>
+          <div class="meta"><strong>Aalborg University</strong>2024 – 2025</div>
           <div class="info">
-            <h3>Icing on wind turbine airfoils</h3>
-            <p class="where">Aalborg University, 2024 to 2025</p>
-            <p>A study of how ice accretion degrades blade aerodynamics in cold climates, combining Ansys Fluent CFD with wind-tunnel tests on 3D-printed iced airfoil models to quantify the loss of lift and rise in drag.</p>
-            <p class="result">Awarded Best Abstract &amp; Presentation at CES 2024.</p>
-            <div class="links"><a class="btn solid" href="icing/">Open the demo</a><a class="btn" href="https://github.com/VeloyFernandes/airfoil-icing">View on GitHub</a></div>
+            <h3>Ice accretion on wind turbine airfoils</h3>
+            <p>A study of how ice accretion degrades blade aerodynamics in cold climates, combining Ansys Fluent CFD with wind-tunnel tests on 3D-printed iced airfoil models to quantify the loss of lift and increase in drag.</p>
+            <p class="outcome"><b>Recognition:</b> Best Abstract &amp; Presentation, CES 2024.</p>
+            <ul class="tags"><li>Ansys Fluent</li><li>Wind-tunnel testing</li><li>Icing</li><li>Aerodynamics</li></ul>
+            <div class="links"><a class="btn solid" href="icing/">Interactive demo</a><a class="btn" href="https://github.com/VeloyFernandes/airfoil-icing">Source code</a></div>
           </div>
         </li>
         <li>
-          <span class="bar" style="background:#2A6FB0"></span>
+          <div class="meta"><strong>Swansea University</strong>2023</div>
           <div class="info">
             <h3>Buckling of corrugated panels</h3>
-            <p class="where">Swansea University, 2023</p>
-            <p>Eigenvalue buckling analysis of trapezoidal and round corrugated panels in Ansys, validated against MATLAB and analytical calculations, with a comparison of how boundary conditions change the critical loads.</p>
-            <div class="links"><a class="btn solid" href="buckling/">Open the demo</a><a class="btn" href="https://github.com/VeloyFernandes/corrugated-panel-buckling">View on GitHub</a></div>
+            <p>Eigenvalue buckling analysis of trapezoidal and round corrugated panels in Ansys, validated against MATLAB and analytical solutions, including a comparison of how boundary conditions affect the critical loads.</p>
+            <ul class="tags"><li>Ansys Mechanical</li><li>MATLAB</li><li>Finite element method</li><li>Finite strip method</li></ul>
+            <div class="links"><a class="btn solid" href="buckling/">Interactive demo</a><a class="btn" href="https://github.com/VeloyFernandes/corrugated-panel-buckling">Source code</a></div>
           </div>
         </li>
       </ul>
@@ -257,15 +227,16 @@
 
   <section id="side">
     <div class="wrap">
-      <h2>Built for myself</h2>
+      <p class="kicker">Software</p>
+      <h2>Other projects</h2>
       <ul class="work">
         <li>
-          <span class="bar" style="background:#456072"></span>
+          <div class="meta"><strong>Personal project</strong>2026</div>
           <div class="info">
             <h3>Linux CCTV viewer</h3>
-            <p class="where">Python and PySide6, 2026</p>
-            <p>A desktop viewer that finds ONVIF cameras on the local network and shows them in a live grid, with pan-tilt-zoom controls, recording, snapshots and hardware-accelerated decoding.</p>
-            <div class="links"><a class="btn solid" href="cctv-demo.html">Open the demo</a><a class="btn" href="https://github.com/VeloyFernandes/Linux_Local_CCTV_Viewer">View on GitHub</a></div>
+            <p>A desktop application that discovers ONVIF cameras on the local network and displays them in a live grid, with pan-tilt-zoom control, recording, snapshots and hardware-accelerated decoding.</p>
+            <ul class="tags"><li>Python</li><li>PySide6</li><li>ONVIF</li><li>RTSP</li></ul>
+            <div class="links"><a class="btn solid" href="cctv-demo.html">Interactive demo</a><a class="btn" href="https://github.com/VeloyFernandes/Linux_Local_CCTV_Viewer">Source code</a></div>
           </div>
         </li>
       </ul>
@@ -275,19 +246,21 @@
   <section id="background">
     <div class="wrap cols">
       <div>
+        <p class="kicker">Career</p>
         <h2>Experience</h2>
         <ul class="timeline">
-          <li><span class="when">Nov 2026 to now</span><div><strong>Research Assistant</strong><span class="org">Aalborg University, Esbjerg</span></div></li>
-          <li><span class="when">Sep 2025 to Jan 2026</span><div><strong>Research and Development Intern</strong><span class="org">Vestas Aircoil, Denmark</span></div></li>
-          <li><span class="when">Jul 2019</span><div><strong>Intern</strong><span class="org">IMECO Machines, Pune</span></div></li>
+          <li><span class="when">Nov 2026 – present</span><strong>Research Assistant</strong><span class="org">Aalborg University, Esbjerg</span><span class="desc">Developing Flowsheet Coder, an offline tool that converts process flowsheet drawings into DWSIM and Aspen Plus simulations using a fine-tuned vision-language model.</span></li>
+          <li><span class="when">Sep 2025 – Jan 2026</span><strong>Research and Development Intern</strong><span class="org">Vestas Aircoil, Denmark</span><span class="desc">Built a multi-region OpenFOAM 13 CFD model of V-type dry coolers, calibrated on test-rig data and validated against manufacturer ratings to within 10%.</span></li>
+          <li><span class="when">Jul 2019</span><strong>Intern</strong><span class="org">IMECO Machines, Pune</span></li>
         </ul>
       </div>
       <div>
+        <p class="kicker">Qualifications</p>
         <h2>Education</h2>
         <ul class="timeline">
-          <li><span class="when">2024 to 2026</span><div><strong>MSc Sustainable Energy Engineering</strong><span class="org">Fluids and Process Systems, Aalborg University</span></div></li>
-          <li><span class="when">2022 to 2023</span><div><strong>Postgraduate Diploma, Aerospace Engineering</strong><span class="org">Swansea University</span></div></li>
-          <li><span class="when">Before 2022</span><div><strong>BE Mechanical Engineering</strong><span class="org">Agnel Institute of Technology and Design, Goa University</span></div></li>
+          <li><span class="when">2024 – 2026</span><strong>MSc in Engineering, Sustainable Energy Engineering</strong><span class="org">Fluids and Process Systems, Aalborg University</span><span class="desc">Thesis in collaboration with Vestas Aircoil.</span></li>
+          <li><span class="when">2022 – 2023</span><strong>Postgraduate Diploma in Aerospace Engineering</strong><span class="org">Swansea University</span><span class="desc">Dissertation on the buckling of corrugated panels.</span></li>
+          <li><span class="when">Before 2022</span><strong>BE in Mechanical Engineering</strong><span class="org">Agnel Institute of Technology and Design, Goa University</span></li>
         </ul>
       </div>
     </div>
@@ -295,52 +268,46 @@
 
   <section id="tools">
     <div class="wrap">
-      <h2>Tools I work with</h2>
+      <p class="kicker">Capabilities</p>
+      <h2>Technical skills</h2>
       <div class="tools">
-        <div>
-          <h3>Fluids and heat transfer</h3>
-          <ul><li>OpenFOAM</li><li>Ansys Fluent</li><li>ParaView</li><li>Wind-tunnel testing</li></ul>
-        </div>
-        <div>
-          <h3>Process simulation</h3>
-          <ul><li>Aspen Plus</li><li>DWSIM</li><li>Life cycle assessment</li><li>Techno-economic analysis</li></ul>
-        </div>
-        <div>
-          <h3>Code and AI</h3>
-          <ul><li>Python</li><li>MATLAB</li><li>LoRA fine-tuning of language and vision models</li><li>High-performance computing</li></ul>
-        </div>
+        <div><h3>Fluids and heat transfer</h3><ul><li>OpenFOAM</li><li>Ansys Fluent</li><li>FENSAP-ICE</li><li>ParaView</li><li>Wind-tunnel testing</li></ul></div>
+        <div><h3>Process simulation</h3><ul><li>Aspen Plus</li><li>DWSIM</li><li>Techno-economic analysis</li><li>Life cycle assessment</li></ul></div>
+        <div><h3>Structures</h3><ul><li>Ansys Mechanical</li><li>Eigenvalue buckling</li><li>Finite element and finite strip methods</li></ul></div>
+        <div><h3>Programming and AI</h3><ul><li>Python</li><li>MATLAB</li><li>LoRA fine-tuning of language and vision models</li><li>High-performance computing</li></ul></div>
       </div>
     </div>
   </section>
 
   <section id="contact" class="contact">
     <div class="wrap">
-      <h2>Open to CFD, thermal and process engineering roles.</h2>
-      <p>I'm based in Esbjerg and open to roles in Denmark and across Europe. Send me a message here and it will reach my inbox.</p>
+      <p class="kicker">Contact</p>
+      <h2>Let's talk</h2>
+      <p>I am open to CFD, thermal and process engineering roles in Denmark and across Europe. Send a message using the form below, or contact me on LinkedIn.</p>
       <p id="sent" class="sent" role="status" hidden>Message sent. Thank you, I'll reply by email.</p>
-      <p class="formnote">Messages are delivered to my inbox by FormSubmit, which receives what you type here. This site uses no cookies or tracking.</p>
       <form class="msg" action="https://formsubmit.co/veloyf@gmail.com" method="POST">
         <input type="hidden" name="_subject" value="New message from veloyfernandes.com">
         <input type="hidden" name="_next" value="https://veloyfernandes.com/?sent=1#contact">
         <input type="hidden" name="_template" value="table">
         <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div class="pair">
-          <label>Your name<input type="text" name="name" required autocomplete="name"></label>
-          <label>Your email<input type="email" name="email" required autocomplete="email"></label>
+          <label>Name<input type="text" name="name" required autocomplete="name"></label>
+          <label>Email<input type="email" name="email" required autocomplete="email"></label>
         </div>
         <label>Message<textarea name="message" rows="5" required></textarea></label>
         <div class="actions">
           <button class="btn solid" type="submit">Send message</button>
-          <a class="btn" href="https://www.linkedin.com/in/veloy/">Message me on LinkedIn</a>
-          <a class="btn" href="https://github.com/VeloyFernandes">See my code on GitHub</a>
+          <a class="btn" href="https://www.linkedin.com/in/veloy/">LinkedIn</a>
+          <a class="btn" href="https://github.com/VeloyFernandes">GitHub</a>
         </div>
       </form>
+      <p class="formnote">Messages are delivered by FormSubmit, which receives what you type here. This site uses no cookies or tracking.</p>
     </div>
   </section>
 </main>
 
 <footer>
-  <div class="wrap">Veloy Fernandes, Esbjerg, Denmark. The background at the top is flow around a NACA 2412 airfoil, solved with a panel method and coloured by local speed.</div>
+  <div class="wrap"><span>© 2026 Veloy Fernandes · Esbjerg, Denmark</span><span>Header background: potential flow around a NACA 2412 airfoil at 5°, solved with a panel method.</span></div>
 </footer>
 
 <script>
@@ -358,7 +325,7 @@
   /* ---------- Hero: panel-method flow around a NACA 2412 airfoil ---------- */
   (function () {
     var canvas = $('flow'), ctx = canvas.getContext('2d');
-    var N = 60, W = 0, H = 0, cx = 0, cy = 0, sc = 1, parts = [];
+    var ALPHA = 5 * Math.PI / 180, N = 60, W = 0, H = 0, cx = 0, cy = 0, sc = 1, parts = [];
     var nx = [], ny = [], pc = [], ps = [], pl = [], q = [], gam = 0, cl = 0, wind = 12;
     var theme = { paper: '#E9EFF1', ink: '#10273A', fade: 'rgba(233,239,241,0.085)' };
 
@@ -433,17 +400,6 @@
       return c;
     }
 
-    function report() {
-      var a = parseFloat($('aoa').value), rho = 1.225, mu = 1.81e-5, lift = 0.5 * rho * wind * wind * cl, re = rho * wind / mu;
-      var e = Math.floor(Math.log(re) / Math.LN10), sup = { '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷' };
-      $('aoao').textContent = a.toFixed(1) + '°';
-      $('windo').textContent = wind + ' m/s';
-      $('cl').textContent = 'NACA 2412 with a 1 m chord: lift coefficient ' + cl.toFixed(2) + ', lift ' + Math.round(lift) + ' N per metre of span, Reynolds number ' + (re / Math.pow(10, e)).toFixed(1) + ' × 10' + (sup[e] || '^' + e) + '. Ideal flow from a panel method, so it never stalls.';
-    }
-    function setAlpha() {
-      solve(parseFloat($('aoa').value) * Math.PI / 180);
-      report(); clear();
-    }
     function clear() { ctx.fillStyle = theme.paper; ctx.fillRect(0, 0, W, H); if (reduce) drawStatic(); }
     function drawFoil() {
       ctx.beginPath();
@@ -486,14 +442,12 @@
       W = r.width; H = r.height; canvas.width = W * dpr; canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (W > 820) { cx = W * 0.75; cy = H * 0.36; sc = W * 0.3; } else { cx = W * 0.6; cy = 150; sc = W * 0.5; }
-      readTheme(); solve(parseFloat($('aoa').value) * Math.PI / 180);
+      readTheme(); solve(ALPHA);
       parts = [];
       var n = Math.round(Math.min(700, W * H / 1700));
       for (var i = 0; i < n; i++) { var p = {}; spawn(p, true); parts.push(p); }
-      report(); clear();
+      clear();
     }
-    $('aoa').addEventListener('input', setAlpha);
-    $('wind').addEventListener('input', function () { wind = +this.value; report(); });
     var mq = window.matchMedia('(prefers-color-scheme: dark)'), onScheme = function () { readTheme(); clear(); };
     if (mq.addEventListener) mq.addEventListener('change', onScheme); else if (mq.addListener) mq.addListener(onScheme);
     window.addEventListener('resize', resize);
