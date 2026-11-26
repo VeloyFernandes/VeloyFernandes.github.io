@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linux CCTV Viewer | Live demo</title>
+<meta name="description" content="A browser demo of Veloy Fernandes' Linux CCTV viewer: a live camera grid with fullscreen, pan-tilt-zoom, recording and snapshots, using synthetic camera feeds.">
+<meta property="og:title" content="Linux CCTV Viewer | Live demo">
+<meta property="og:description" content="Try the camera wall in your browser with synthetic feeds.">
+<style>
+  @font-face { font-family: "IBM Plex Sans"; src: url("fonts/plex-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "IBM Plex Sans"; src: url("fonts/plex-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: "IBM Plex Sans"; src: url("fonts/plex-600.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+  :root {
+    color-scheme: dark;
+    --bg: #121218; --bar: #1b1b24; --side: #17171f; --line: #2b2b38; --line2: #383847;
+    --btn: #2a2a37; --btn-hi: #32323f; --text: #e6e6ef; --soft: #9a9aa8; --dim: #6f6f80;
+    --blue: #3b82f6; --tile: #0d0d12; --tile-line: #262632;
+    --ok: #3ddc84; --wait: #fbbf24; --retry: #fb923c; --err: #f87171; --off: #8b8b9a;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 13px/1.4 "IBM Plex Sans", "Ubuntu", "Noto Sans", "DejaVu Sans", sans-serif;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  a { color: inherit; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+  /* Intro strip */
+  .intro {
+    display: flex; align-items: center; gap: 0.75rem 1.25rem; flex-wrap: wrap;
+    padding: 0.55rem 16px; background: #0b1a26; border-bottom: 1px solid #1d3346; color: #c9d6dc;
+  }
+  .intro strong { color: #fff; font-weight: 600; }
+  .intro p { margin: 0; flex: 1 1 22rem; }
+  .intro .links { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .intro .links a {
+    text-decoration: none; padding: 0.3rem 0.8rem; border: 1px solid #5b7688; border-radius: 999px; white-space: nowrap;
+  }
+  .intro .links a:hover { border-color: var(--blue); }
+  .intro .links a.main { background: #e9eff1; color: #10273a; border-color: #e9eff1; font-weight: 600; }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex; align-items: center; gap: 4px; padding: 6px 8px; background: var(--bar);
+    border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; flex: none;
+  }
+  .toolbar::-webkit-scrollbar { display: none; }
+  .toolbar button {
+    background: transparent; border: 0; border-radius: 6px; padding: 7px 12px; color: #d9d9e3; white-space: nowrap;
+  }
+  .toolbar button:hover { background: #272734; }
+  .toolbar button[aria-pressed="true"] { background: #303042; }
+  .toolbar .sep { width: 1px; height: 20px; background: var(--line); flex: none; margin: 0 2px; }
+  .toolbar .grow { flex: 1; min-width: 8px; }
+
+  /* Body */
+  .body { flex: 1; display: flex; min-height: 0; position: relative; }
+  .sidebar {
+    width: 240px; flex: none; background: var(--side); border-right: 1px solid var(--line);
+    padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden;
+    transition: width 0.18s ease-out, padding 0.18s ease-out, border-color 0.18s;
+  }
+  .sidebar.closed { width: 0; padding-left: 0; padding-right: 0; border-right-color: transparent; }
+  .side-head { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .side-head h2 { margin: 0; flex: 1; color: var(--soft); font-size: 11px; font-weight: 600; letter-spacing: 1px; }
+  .count { color: var(--dim); background: #22222c; border-radius: 8px; padding: 1px 8px; font-size: 11px; }
+  .side-add { width: 34px; background: var(--btn); border: 1px solid var(--line2); border-radius: 6px; padding: 4px; }
+  .side-add:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .cam-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; }
+  .cam-list li {
+    display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 6px; cursor: pointer; white-space: nowrap;
+  }
+  .cam-list li:hover { background: #22222e; }
+  .cam-list .dot { font-size: 11px; }
+  .cam-list .nm { flex: 1; font-weight: 600; color: #e0e0e8; overflow: hidden; text-overflow: ellipsis; }
+  .cam-list .host { color: #7d7d8e; font-size: 11px; }
+  .cam-list .rec { color: #fda4af; background: #7f1d1d; border-radius: 4px; padding: 0 5px; font-size: 10px; font-weight: 600; }
+
+  .grid { flex: 1; display: grid; gap: 8px; padding: 8px; min-width: 0; min-height: 0; }
+  .tile {
+    position: relative; background: var(--tile); border: 1px solid var(--tile-line); border-radius: 8px;
+    overflow: hidden; min-width: 0; min-height: 0; user-select: none; -webkit-user-select: none;
+  }
+  .tile.flash, .tile.drop { border-color: var(--blue); }
+  .tile canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .tile .empty {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; color: #63636f; font-weight: 600; text-align: center; padding: 8px;
+  }
+  .tile .empty span { color: #7d7d8e; font-weight: 400; font-size: 12px; }
+  .ov { position: absolute; display: flex; gap: 6px; align-items: center; pointer-events: none; max-width: calc(100% - 12px); }
+  .ov.tl { top: 6px; left: 6px; }
+  .ov.tr { top: 6px; right: 6px; }
+  .ov.bl { bottom: 6px; left: 6px; }
+  .chip { background: rgba(10,10,16,0.78); border-radius: 5px; padding: 3px 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chip.name { color: #f2f2f6; font-weight: 600; }
+  .chip.q { font-weight: 600; font-size: 11px; padding: 3px 8px; }
+  .chip.recb { color: #fff; background: #e11d48; font-weight: 600; font-size: 11px; padding: 3px 8px; }
+  .chip.recb.dim { color: #fda4af; background: #7f1d1d; }
+  .chip.info { color: #9fa0ad; font-size: 11px; padding: 2px 8px; }
+  .grid.dense .chip.info, .grid.narrow .chip.q { display: none; }
+  .grid .ov.bl { max-width: 58%; }
+  .grid.dense .chip { font-size: 11px; padding: 2px 6px; }
+
+  /* Fullscreen view */
+  .full { position: absolute; inset: 0; background: #000; z-index: 5; display: none; }
+  .full.on { display: block; }
+  .full .tile { position: absolute; inset: 0; border: 0; border-radius: 0; }
+  .full .chip.name { font-size: 16px; padding: 6px 14px; }
+  .full .chip.status { font-size: 13px; padding: 6px 14px; }
+  .hint {
+    position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: rgba(10,10,16,0.6);
+    color: rgba(235,235,242,0.9); padding: 6px 14px; border-radius: 6px; white-space: nowrap; pointer-events: none;
+  }
+  .back {
+    position: absolute; top: 50px; left: 10px; background: rgba(10,10,16,0.78); border: 1px solid #343442;
+    border-radius: 6px; padding: 5px 12px; z-index: 2;
+  }
+  .ptz {
+    position: absolute; right: 14px; bottom: 14px; background: rgba(10,10,16,0.82); border: 1px solid #343442;
+    border-radius: 10px; padding: 8px 10px 10px; display: grid; gap: 6px; justify-items: center; z-index: 2;
+  }
+  .ptz h3 { margin: 0; font-size: 13px; font-weight: 600; justify-self: start; }
+  .pad { display: grid; grid-template-columns: repeat(3, 46px); grid-template-rows: repeat(3, 42px); gap: 4px; }
+  .zoom { display: flex; gap: 4px; }
+  .ptz button {
+    width: 46px; height: 42px; background: var(--btn); border: 1px solid var(--line2); border-radius: 8px;
+    font-size: 17px; font-weight: 600; touch-action: none;
+  }
+  .ptz button:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .ptz button:active { background: #1d4ed8; }
+  .ptz .st { color: var(--ok); font-size: 11px; }
+
+  /* Status bar */
+  .status {
+    display: flex; align-items: center; background: var(--bar); border-top: 1px solid var(--line);
+    color: #b7b7c6; font-size: 12px; flex: none; overflow: hidden; white-space: nowrap;
+  }
+  .status span { padding: 4px 10px; }
+  .status span + span { border-left: 1px solid var(--line); }
+  .status .grow { flex: 1; }
+
+  /* Context menu */
+  .menu {
+    position: fixed; z-index: 20; background: #1e1e28; border: 1px solid #343442; border-radius: 6px; padding: 4px;
+    min-width: 190px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); display: none;
+  }
+  .menu.on { display: block; }
+  .menu button { display: block; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 4px; padding: 6px 24px 6px 12px; color: #e0e0e8; }
+  .menu button:hover, .menu button:focus-visible { background: var(--blue); color: #fff; outline: none; }
+  .menu hr { border: 0; border-top: 1px solid #343442; margin: 4px 0; }
+
+  /* Toasts */
+  .toasts { position: fixed; right: 16px; bottom: 40px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 30; pointer-events: none; max-width: calc(100vw - 32px); }
+  .toast {
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 14px; font-size: 12px;
+    opacity: 0; transform: translateY(6px); transition: opacity 0.22s, transform 0.22s;
+  }
+  .toast.on { opacity: 1; transform: none; }
+  .toast.info { background: #2b6cb0; color: #dbeafe; }
+  .toast.success { background: #276749; color: #c6f6d5; }
+  .toast.warning { background: #b7791f; color: #fefcbf; }
+  .toast.error { background: #9b2c2c; color: #fed7d7; }
+
+  @media (max-width: 760px) {
+    .sidebar { position: absolute; z-index: 4; top: 0; bottom: 0; left: 0; box-shadow: 6px 0 20px rgba(0,0,0,0.4); }
+    .status .opt { display: none; }
+    .grid { gap: 6px; padding: 6px; overflow-y: auto; align-content: start; }
+    .grid.narrow .tile { aspect-ratio: 16 / 9; }
+    .ptz { transform: scale(0.85); transform-origin: bottom right; right: 8px; bottom: 8px; }
+    .hint { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sidebar, .toast { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <p><strong>Linux CCTV Viewer, live demo.</strong> This runs in your browser with synthetic camera feeds, like the app's <code>--demo</code> mode. The real app is a Python and PySide6 desktop program that connects to ONVIF IP cameras.</p>
+  <div class="links">
+    <a class="main" href="https://github.com/VeloyFernandes/Linux_Local_CCTV_Viewer">Code on GitHub</a>
+    <a href="./#side">Back to the site</a>
+  </div>
+</div>
+
+<div class="toolbar" role="toolbar" aria-label="Monitor">
+  <button type="button" id="tSide" aria-pressed="true">☰ Cameras</button>
+  <span class="sep"></span>
+  <button type="button" id="tAdd">＋ Add Camera</button>
+  <span class="sep"></span>
+  <button type="button" id="tRe">Reconnect All</button>
+  <span class="sep"></span>
+  <button type="button" id="tQual" aria-pressed="true">Grid Quality: High</button>
+  <span class="sep"></span>
+  <button type="button" id="tNet" aria-pressed="false">Network: Local</button>
+  <span class="grow"></span>
+</div>
+
+<div class="body">
+  <aside class="sidebar" id="side" aria-label="Cameras">
+    <div class="side-head"><h2>CAMERAS</h2><span class="count" id="count">0</span><button type="button" class="side-add" id="sAdd" aria-label="Add camera">＋</button></div>
+    <ul class="cam-list" id="list"></ul>
+  </aside>
+  <main class="grid" id="grid" aria-label="Camera wall"></main>
+  <div class="full" id="full">
+    <button type="button" class="back" id="back">← Back to grid</button>
+    <div class="ptz" id="ptz">
+      <h3 id="ptzT">PTZ</h3>
+      <div class="pad">
+        <span></span><button type="button" data-m="0,-1,0" aria-label="Tilt up">▲</button><span></span>
+        <button type="button" data-m="-1,0,0" aria-label="Pan left">◀</button><button type="button" data-m="stop" aria-label="Stop">■</button><button type="button" data-m="1,0,0" aria-label="Pan right">▶</button>
+        <span></span><button type="button" data-m="0,1,0" aria-label="Tilt down">▼</button><span></span>
+      </div>
+      <div class="zoom"><button type="button" data-m="0,0,1" aria-label="Zoom in">+</button><button type="button" data-m="0,0,-1" aria-label="Zoom out">−</button></div>
+      <span class="st" id="ptzS">PTZ ready</span>
+    </div>
+    <span class="hint">Double-click or press Esc to return to the grid. Hold the arrows to move the camera.</span>
+  </div>
+</div>
+
+<div class="status" role="status">
+  <span class="grow" id="sCams">No cameras</span>
+  <span class="opt" id="sNet">NET —</span>
+  <span id="sDec">DECODE —</span>
+</div>
+
+<div class="menu" id="menu" role="menu"></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STATE = { connected: ['#3ddc84', 'Connected'], connecting: ['#fbbf24', 'Connecting'], reconnecting: ['#fb923c', 'Reconnecting'] };
+  var NAMES = ['Front Door', 'Driveway', 'Garden', 'Garage', 'Back Yard', 'Side Gate', 'Workshop', 'Porch',
+               'Street', 'Parking', 'Shed', 'Hallway', 'Office', 'Lobby', 'Loading Bay', 'Roof'];
+  var HUES = [210, 28, 140, 265, 190, 350, 95, 45, 230, 170, 10, 300, 120, 200, 60, 320];
+  var MAX = 16, nextId = 1;
+  var cams = [], tiles = [];
+  var settings = { quality: 'high', network: 'local', sidebar: window.innerWidth > 760 };
+  var full = null; // { cam, tile }
+
+  function makeCam(i) {
+    var id = nextId++;
+    return { id: id, name: NAMES[(id - 1) % NAMES.length], hue: HUES[(id - 1) % HUES.length], seed: id * 7.3,
+             host: '192.168.1.' + (100 + id), state: 'connecting', since: performance.now(), rec: false,
+             pan: 0, tilt: 0, zoom: 1, move: null, frames: 0 };
+  }
+
+  /* Same layout rule as MainWindow._grid_shape */
+  function shape(n) {
+    if (n <= 1) return [1, 1];
+    if (n <= 4) return [2, 2];
+    if (n <= 8) return [2, 4];
+    if (n === 9) return [3, 3];
+    var cols = n <= 16 ? 4 : n <= 20 ? 5 : 6;
+    return [Math.ceil(n / cols), cols];
+  }
+
+  /* ---------------- tiles ---------------- */
+  function buildTile(slot) {
+    var el = document.createElement('div');
+    el.className = 'tile';
+    el.tabIndex = 0;
+    el.innerHTML = '<canvas></canvas><div class="empty"><div>EMPTY SLOT</div><span>Double-click or right-click to add a camera</span></div>' +
+      '<div class="ov tl"><span class="chip recb" hidden>● REC</span><span class="chip name"></span><span class="chip q"></span></div>' +
+      '<div class="ov tr"><span class="chip status"></span></div><div class="ov bl"><span class="chip info"></span></div>';
+    var t = { el: el, slot: slot, cam: null, canvas: el.querySelector('canvas'),
+              empty: el.querySelector('.empty'), rec: el.querySelector('.recb'), name: el.querySelector('.name'),
+              q: el.querySelector('.q'), status: el.querySelector('.status'), info: el.querySelector('.info') };
+    t.ctx = t.canvas.getContext('2d');
+    el.addEventListener('dblclick', function () { t.cam ? openFull(t.cam) : addCamera(t.slot); });
+    el.addEventListener('contextmenu', function (e) { e.preventDefault(); showMenu(t, e.clientX, e.clientY); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { t.cam ? openFull(t.cam) : addCamera(t.slot); }
+      if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
+        e.preventDefault(); var r = el.getBoundingClientRect(); showMenu(t, r.left + 20, r.top + 20);
+      }
+    });
+    // long-press opens the menu on touch screens
+    var lp = null;
+    el.addEventListener('touchstart', function (e) {
+      var p = e.touches[0];
+      lp = setTimeout(function () { showMenu(t, p.clientX, p.clientY); lp = null; }, 550);
+    }, { passive: true });
+    ['touchend', 'touchmove', 'touchcancel'].forEach(function (k) { el.addEventListener(k, function () { clearTimeout(lp); }, { passive: true }); });
+    // drag & drop to rearrange
+    el.addEventListener('dragstart', function (e) { if (!t.cam) { e.preventDefault(); return; } e.dataTransfer.setData('text/plain', String(t.cam.id)); e.dataTransfer.effectAllowed = 'move'; });
+    el.addEventListener('dragover', function (e) { e.preventDefault(); el.classList.add('drop'); });
+    el.addEventListener('dragleave', function () { el.classList.remove('drop'); });
+    el.addEventListener('drop', function (e) {
+      e.preventDefault(); el.classList.remove('drop');
+      var id = +e.dataTransfer.getData('text/plain');
+      if (id) reorder(id, t.slot);
+    });
+    return t;
+  }
+
+  function bind(t, cam) {
+    t.cam = cam;
+    t.el.draggable = !!cam;
+    t.empty.hidden = !!cam;
+    t.el.querySelectorAll('.ov').forEach(function (o) { o.hidden = !cam; });
+    if (cam) {
+      t.el.setAttribute('aria-label', cam.name + ' camera');
+      t.name.textContent = cam.name;
+      paintChips(t);
+    } else {
+      t.el.setAttribute('aria-label', 'Empty slot');
+      t.ctx.clearRect(0, 0, t.canvas.width, t.canvas.height);
+    }
+  }
+
+  function paintChips(t) {
+    var cam = t.cam; if (!cam) return;
+    var main = full && full.tile === t ? true : settings.quality === 'high';
+    t.q.textContent = main ? 'MAIN' : 'SUB';
+    t.q.style.color = main ? '#60a5fa' : '#fbbf24';
+    t.rec.hidden = !cam.rec;
+  }
+
+  function rebuild() {
+    var n = cams.length, grid = $('grid');
+    var narrow = window.innerWidth <= 760;
+    // phones: a scrolling column of 16:9 tiles instead of the desktop wall
+    var s = narrow ? [Math.max(1, Math.ceil((n + 1) / (n > 2 ? 2 : 1))), n > 2 ? 2 : 1] : shape(n);
+    if (narrow) s[0] = Math.ceil(Math.min(n + 1, MAX) / s[1]);
+    grid.classList.toggle('narrow', narrow);
+    grid.style.gridTemplateRows = narrow ? '' : 'repeat(' + s[0] + ', minmax(0, 1fr))';
+    grid.style.gridTemplateColumns = 'repeat(' + s[1] + ', minmax(0, 1fr))';
+    grid.classList.toggle('dense', narrow ? s[1] > 1 : (s[1] >= 4 && window.innerWidth < 1100));
+    grid.textContent = '';
+    tiles = [];
+    for (var i = 0; i < s[0] * s[1]; i++) {
+      var t = buildTile(i);
+      grid.appendChild(t.el);
+      tiles.push(t);
+      bind(t, cams[i] || null);
+    }
+    rebuildList();
+    updateStatus();
+  }
+
+  function rebuildList() {
+    var ul = $('list');
+    ul.textContent = '';
+    $('count').textContent = cams.length;
+    cams.forEach(function (cam) {
+      var li = document.createElement('li');
+      li.tabIndex = 0;
+      li.innerHTML = '<span class="dot">●</span><span class="nm"></span><span class="host"></span><span class="rec" hidden>REC</span>';
+      li.querySelector('.nm').textContent = cam.name;
+      li.querySelector('.host').textContent = settings.network === 'remote' ? 'remote' : cam.host;
+      li.querySelector('.dot').style.color = STATE[cam.state][0];
+      li.querySelector('.rec').hidden = !cam.rec;
+      li.addEventListener('click', function () { flash(cam); });
+      li.addEventListener('dblclick', function () { openFull(cam); });
+      li.addEventListener('keydown', function (e) { if (e.key === 'Enter') openFull(cam); });
+      cam.li = li;
+      ul.appendChild(li);
+    });
+  }
+
+  function flash(cam) {
+    tiles.forEach(function (t) {
+      if (t.cam === cam) { t.el.classList.add('flash'); setTimeout(function () { t.el.classList.remove('flash'); }, 700); }
+    });
+  }
+
+  /* ---------------- camera actions ---------------- */
+  function connect(cam, detail) {
+    cam.state = cam.frames ? 'reconnecting' : 'connecting';
+    cam.since = performance.now();
+    cam.delay = 500 + Math.random() * 900;
+    cam.detail = detail;
+    setDot(cam);
+  }
+
+  function setDot(cam) { if (cam.li) cam.li.querySelector('.dot').style.color = STATE[cam.state][0]; }
+
+  function addCamera(slot) {
+    if (cams.length >= MAX) { toast('This demo stops at ' + MAX + ' cameras', 'warning'); return; }
+    var cam = makeCam();
+    if (typeof slot === 'number' && slot < cams.length) cams.splice(slot, 0, cam); else cams.push(cam);
+    connect(cam);
+    rebuild();
+    toast(cam.name + ' added', 'success');
+  }
+
+  function removeCamera(cam) {
+    if (full && full.cam === cam) closeFull();
+    cams.splice(cams.indexOf(cam), 1);
+    rebuild();
+    toast(cam.name + ' removed', 'info');
+  }
+
+  function reorder(id, slot) {
+    var src = cams.findIndex(function (c) { return c.id === id; });
+    if (src < 0) return;
+    var dst = Math.min(slot, cams.length - 1);
+    if (src === dst) return;
+    var cam = cams.splice(src, 1)[0];
+    cams.splice(dst, 0, cam);
+    rebuild();
+  }
+
+  function snapshot(cam) {
+    var c = document.createElement('canvas');
+    c.width = 1280; c.height = 720;
+    drawScene(c.getContext('2d'), 1280, 720, cam, performance.now() / 1000, true);
+    var a = document.createElement('a');
+    a.download = cam.name.replace(/\W+/g, '_') + '_' + stamp() + '.png';
+    a.href = c.toDataURL('image/png');
+    a.click();
+    toast('Snapshot saved: ' + a.download, 'success');
+  }
+
+  function toggleRec(cam) {
+    cam.rec = !cam.rec;
+    if (cam.rec) { cam.recStart = Date.now(); toast('Recording started: ' + cam.name.replace(/\W+/g, '_') + '_' + stamp() + '.mp4', 'info'); }
+    else {
+      var secs = Math.round((Date.now() - cam.recStart) / 1000);
+      toast('Recording saved (' + secs + ' s). In the real app this is an MP4 file.', 'success');
+    }
+    tiles.forEach(function (t) { if (t.cam === cam) paintChips(t); });
+    if (full && full.cam === cam) paintChips(full.tile);
+    if (cam.li) cam.li.querySelector('.rec').hidden = !cam.rec;
+  }
+
+  function stamp() {
+    var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
+  }
+
+  /* ---------------- context menu ---------------- */
+  var menu = $('menu');
+  function showMenu(t, x, y) {
+    menu.textContent = '';
+    var items = t.cam ? [
+      ['Fullscreen', function () { openFull(t.cam); }],
+      ['PTZ Controls…', function () { openFull(t.cam); }],
+      ['Take Snapshot', function () { snapshot(t.cam); }],
+      [t.cam.rec ? 'Stop Recording' : 'Start Recording', function () { toggleRec(t.cam); }],
+      ['Reconnect', function () { connect(t.cam, 'Restarting…'); }],
+      null,
+      ['Remove Camera', function () { removeCamera(t.cam); }]
+    ] : [['Add camera here…', function () { addCamera(t.slot); }]];
+    items.forEach(function (it) {
+      if (!it) { menu.appendChild(document.createElement('hr')); return; }
+      var b = document.createElement('button');
+      b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = it[0];
+      b.addEventListener('click', function () { hideMenu(); it[1](); });
+      menu.appendChild(b);
+    });
+    menu.classList.add('on');
+    var r = menu.getBoundingClientRect();
+    menu.style.left = Math.max(4, Math.min(x, window.innerWidth - r.width - 4)) + 'px';
+    menu.style.top = Math.max(4, Math.min(y, window.innerHeight - r.height - 4)) + 'px';
+    menu.querySelector('button').focus();
+  }
+  function hideMenu() { menu.classList.remove('on'); }
+  document.addEventListener('mousedown', function (e) { if (!menu.contains(e.target)) hideMenu(); });
+  window.addEventListener('blur', hideMenu);
+  var wasNarrow = window.innerWidth <= 760;
+  window.addEventListener('resize', function () {
+    hideMenu();
+    var narrow = window.innerWidth <= 760;
+    if (narrow !== wasNarrow) { wasNarrow = narrow; rebuild(); }
+  });
+
+  /* ---------------- fullscreen + PTZ ---------------- */
+  var fullEl = $('full');
+  var fullTile = buildTile(0);
+  fullTile.el.draggable = false;
+  fullEl.insertBefore(fullTile.el, fullEl.firstChild);
+  fullTile.el.addEventListener('dblclick', function (e) { e.stopPropagation(); closeFull(); }, true);
+
+  function openFull(cam) {
+    hideMenu();
+    full = { cam: cam, tile: fullTile };
+    bind(fullTile, cam);
+    fullTile.status.dataset.k = '';
+    fullEl.classList.add('on');
+    $('ptzT').textContent = 'PTZ — ' + cam.name;
+    connect(cam, 'Switching to the main stream…');
+    $('back').focus();
+  }
+  function closeFull() {
+    if (!full) return;
+    var cam = full.cam;
+    cam.move = null;
+    full = null;
+    fullEl.classList.remove('on');
+    connect(cam, 'Back to the grid stream…');
+    tiles.forEach(function (t) { if (t.cam === cam) t.el.focus(); });
+  }
+  $('back').addEventListener('click', closeFull);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { if (menu.classList.contains('on')) hideMenu(); else closeFull(); }
+  });
+
+  document.querySelectorAll('#ptz button').forEach(function (b) {
+    var m = b.dataset.m;
+    function start(e) {
+      e.preventDefault();
+      if (!full) return;
+      full.cam.move = m === 'stop' ? null : m.split(',').map(Number);
+      $('ptzS').textContent = m === 'stop' ? 'Stopped' : 'Moving…';
+    }
+    function end() { if (full) { full.cam.move = null; $('ptzS').textContent = 'PTZ ready'; } }
+    b.addEventListener('pointerdown', start);
+    b.addEventListener('pointerup', end);
+    b.addEventListener('pointerleave', end);
+    b.addEventListener('pointercancel', end);
+    b.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Enter') { start(e); setTimeout(end, 350); } });
+  });
+
+  /* ---------------- synthetic camera scene ---------------- */
+  function drawScene(ctx, w, h, cam, now, hd) {
+    var sky = ctx.createLinearGradient(0, 0, 0, h);
+    sky.addColorStop(0, 'hsl(' + cam.hue + ',30%,22%)');
+    sky.addColorStop(0.62, 'hsl(' + cam.hue + ',25%,36%)');
+    sky.addColorStop(0.62, 'hsl(' + ((cam.hue + 60) % 360) + ',14%,20%)');
+    sky.addColorStop(1, 'hsl(' + ((cam.hue + 60) % 360) + ',14%,12%)');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.save();
+    // pan/tilt/zoom: the world is wider than the view
+    ctx.translate(w / 2, h / 2);
+    ctx.scale(cam.zoom, cam.zoom);
+    ctx.translate(-w / 2 - cam.pan * w * 0.6, -h / 2 - cam.tilt * h * 0.4);
+    var horizon = h * 0.62;
+    // buildings
+    for (var i = -6; i < 14; i++) {
+      var r = Math.abs(Math.sin(cam.seed * 13.1 + i * 7.7));
+      var bw = w * (0.08 + 0.07 * r), bh = h * (0.12 + 0.3 * Math.abs(Math.sin(cam.seed + i * 3.1)));
+      var bx = i * w * 0.13 + r * w * 0.03;
+      ctx.fillStyle = 'hsl(' + cam.hue + ',12%,' + (14 + 10 * r) + '%)';
+      ctx.fillRect(bx, horizon - bh, bw, bh);
+      ctx.fillStyle = 'rgba(255,220,140,' + (0.18 + 0.25 * r) + ')';
+      for (var wy = horizon - bh + h * 0.03; wy < horizon - h * 0.04; wy += h * 0.055)
+        for (var wx = bx + bw * 0.15; wx < bx + bw * 0.85; wx += bw * 0.28)
+          if (Math.sin(wx * 0.37 + wy * 0.11 + cam.seed) > 0) ctx.fillRect(wx, wy, bw * 0.12, h * 0.025);
+    }
+    // road markings
+    ctx.strokeStyle = 'rgba(230,230,240,0.35)';
+    ctx.lineWidth = Math.max(1, h * 0.008);
+    ctx.setLineDash([w * 0.05, w * 0.04]);
+    ctx.beginPath(); ctx.moveTo(-w, h * 0.84); ctx.lineTo(w * 2, h * 0.84); ctx.stroke();
+    ctx.setLineDash([]);
+    // moving object, like the app's demo frame
+    var span = w * 1.6, x = ((now * w * 0.11 + cam.seed * 97) % span) - w * 0.3;
+    var y = horizon + h * 0.12 + Math.sin(now * 0.9 + cam.seed) * h * 0.05;
+    ctx.fillStyle = '#ffb400';
+    ctx.beginPath(); ctx.arc(x, y, h * 0.055, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    // frame border + timestamp (drawn by the camera, so not moved by PTZ)
+    ctx.strokeStyle = 'rgba(120,120,150,0.8)';
+    ctx.lineWidth = Math.max(1, h * 0.004);
+    ctx.strokeRect(w * 0.012, h * 0.02, w * 0.976, h * 0.96);
+    var d = new Date();
+    var ts = d.toLocaleDateString('en-GB') + ' ' + d.toLocaleTimeString('en-GB');
+    ctx.font = '600 ' + Math.round(h * (hd ? 0.045 : 0.06)) + 'px ui-monospace, Menlo, Consolas, monospace';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillText(ts, w * 0.975 + 1, h * 0.95 + 1);
+    ctx.fillStyle = 'rgba(240,240,240,0.92)';
+    ctx.fillText(ts, w * 0.975, h * 0.95);
+  }
+
+  function drawTile(t, now, ms) {
+    var cam = t.cam; if (!cam) return;
+    var rect = t.canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    var isFull = full && full.tile === t;
+    var main = isFull || settings.quality === 'high';
+    // SUB decodes at a lower resolution, so it renders that way too
+    var dpr = Math.min(window.devicePixelRatio || 1, 2) * (main ? 1 : 0.45);
+    var cw = Math.max(64, Math.round(rect.width * dpr)), ch = Math.max(36, Math.round(rect.height * dpr));
+    if (t.canvas.width !== cw || t.canvas.height !== ch) { t.canvas.width = cw; t.canvas.height = ch; }
+    var ctx = t.ctx;
+    ctx.imageSmoothingEnabled = true;
+
+    var status;
+    if (cam.state !== 'connected') {
+      ctx.fillStyle = '#0d0d12'; ctx.fillRect(0, 0, cw, ch);
+      ctx.fillStyle = '#63636f';
+      ctx.font = '600 ' + Math.round(Math.min(ch * 0.07, 15 * dpr)) + 'px "IBM Plex Sans", sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(cam.detail || 'Opening RTSP stream…', cw / 2, ch / 2);
+      status = '<span style="color:' + STATE[cam.state][0] + '">●</span>' + (!isFull && $('grid').classList.contains('dense') ? '' : ' ' + STATE[cam.state][1]);
+      t.info.textContent = '';
+    } else {
+      // the stream draws the scene letterboxed at 16:9
+      var vw = cw, vh = cw * 9 / 16;
+      if (vh > ch) { vh = ch; vw = ch * 16 / 9; }
+      ctx.fillStyle = '#0d0d12'; ctx.fillRect(0, 0, cw, ch);
+      ctx.save();
+      ctx.translate((cw - vw) / 2, (ch - vh) / 2);
+      ctx.beginPath(); ctx.rect(0, 0, vw, vh); ctx.clip();
+      drawScene(ctx, vw, vh, cam, now / 1000, isFull);
+      ctx.restore();
+      var fps = main ? 20 : 15;
+      var dense = !isFull && $('grid').classList.contains('dense');
+      status = '<span style="color:#3ddc84">●</span> ' + (dense ? fps + ' FPS' : 'Connected · ' + fps + ' FPS');
+      var res = main ? '1920×1080' : '640×360';
+      var kbps = main ? 4096 + Math.round(Math.sin(now / 900 + cam.seed) * 300) : 512 + Math.round(Math.sin(now / 900 + cam.seed) * 60);
+      t.info.textContent = (main ? 'MAIN' : 'SUB') + ' · ' + res + ' · ' + fps + ' fps · ' + kbps + ' kb/s · ' +
+        (settings.network === 'remote' ? 48 + Math.round(Math.random() * 6) : 2 + Math.round(Math.random() * 2)) + ' ms · CPU';
+    }
+    if (t.status.dataset.k !== status) { t.status.innerHTML = status; t.status.dataset.k = status; }
+    // REC badge pulse
+    if (cam.rec) t.rec.classList.toggle('dim', Math.floor(now / 500) % 2 === 1);
+  }
+
+  /* ---------------- main loop ---------------- */
+  var last = performance.now(), lastPaint = 0;
+  function loop(now) {
+    var dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    cams.forEach(function (cam) {
+      if (cam.state !== 'connected' && now - cam.since > cam.delay) {
+        cam.state = 'connected'; cam.frames++;
+        setDot(cam);
+        updateStatus();
+      }
+      if (cam.move) {
+        cam.pan = Math.max(-1, Math.min(1, cam.pan + cam.move[0] * dt * 0.5));
+        cam.tilt = Math.max(-0.6, Math.min(0.6, cam.tilt + cam.move[1] * dt * 0.4));
+        cam.zoom = Math.max(1, Math.min(3, cam.zoom * (1 + cam.move[2] * dt * 0.8)));
+      }
+    });
+    // paint at ~20 fps, like the demo stream (slower with reduced motion)
+    if (now - lastPaint >= (reduce ? 1000 : 50)) {
+      lastPaint = now;
+      if (full) drawTile(full.tile, now);
+      else tiles.forEach(function (t) { drawTile(t, now); });
+    }
+    requestAnimationFrame(loop);
+  }
+
+  function updateStatus() {
+    var on = cams.filter(function (c) { return c.state === 'connected'; }).length;
+    $('sCams').textContent = cams.length ? '● ' + on + '/' + cams.length + ' connected' : 'No cameras — use “＋ Add Camera”.';
+    var kb = on * (settings.quality === 'high' ? 4.1 : 0.5);
+    $('sNet').textContent = 'NET ↓' + (kb >= 1 ? kb.toFixed(1) + 'M' : Math.round(kb * 1000) + 'K') + ' ↑0K';
+    $('sDec').textContent = on ? 'DECODE CPU×' + on : 'DECODE —';
+  }
+
+  /* ---------------- toasts ---------------- */
+  var recent = {};
+  function toast(text, kind) {
+    var now = Date.now();
+    if (recent[text] && now - recent[text] < 4000) return;
+    recent[text] = now;
+    var box = $('toasts');
+    while (box.children.length >= 4) box.removeChild(box.firstChild);
+    var el = document.createElement('div');
+    el.className = 'toast ' + (kind || 'info');
+    el.textContent = text;
+    box.appendChild(el);
+    requestAnimationFrame(function () { el.classList.add('on'); });
+    setTimeout(function () { el.classList.remove('on'); setTimeout(function () { el.remove(); }, 300); }, 3200);
+  }
+
+  /* ---------------- toolbar ---------------- */
+  function setSidebar(open) {
+    settings.sidebar = open;
+    $('side').classList.toggle('closed', !open);
+    $('tSide').setAttribute('aria-pressed', String(open));
+  }
+  $('tSide').addEventListener('click', function () { setSidebar(!settings.sidebar); });
+  $('tAdd').addEventListener('click', function () { addCamera(); });
+  $('sAdd').addEventListener('click', function () { addCamera(); });
+  $('tRe').addEventListener('click', function () {
+    cams.forEach(function (c) { connect(c, 'Restarting…'); });
+    updateStatus();
+  });
+  $('tQual').addEventListener('click', function () {
+    settings.quality = settings.quality === 'high' ? 'low' : 'high';
+    var high = settings.quality === 'high';
+    this.textContent = 'Grid Quality: ' + (high ? 'High' : 'Low');
+    this.setAttribute('aria-pressed', String(high));
+    cams.forEach(function (c) { connect(c, high ? 'Opening main stream…' : 'Opening substream…'); });
+    tiles.forEach(paintChips);
+    updateStatus();
+    toast('Grid switched to ' + (high ? 'high' : 'low') + ' quality — reconnecting streams…', 'info');
+  });
+  $('tNet').addEventListener('click', function () {
+    settings.network = settings.network === 'local' ? 'remote' : 'local';
+    var remote = settings.network === 'remote';
+    this.textContent = 'Network: ' + (remote ? 'Remote' : 'Local');
+    this.setAttribute('aria-pressed', String(remote));
+    cams.forEach(function (c) { connect(c, remote ? 'Connecting through the remote endpoint…' : 'Connecting on the local network…'); });
+    rebuildList();
+    updateStatus();
+    toast('Switched to ' + settings.network + ' network — reconnecting streams…', 'info');
+  });
+
+  /* ---------------- start ---------------- */
+  setSidebar(settings.sidebar);
+  for (var i = 0; i < 6; i++) { var c = makeCam(); c.delay = 300 + i * 180; cams.push(c); }
+  rebuild();
+  requestAnimationFrame(loop);
+  setTimeout(function () { toast('Double-click a camera for fullscreen and PTZ. Right-click (or long-press) for more.', 'info'); }, 1600);
+})();
+</script>
+</body>
+</html>
