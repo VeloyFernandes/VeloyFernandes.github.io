@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Green Methanol Power-to-X · Wind &amp; Solar Powered Alkaline Electrolysis</title>
+<meta name="description" content="Interactive simulation of a co-located wind and solar farm powering alkaline electrolysis to upgrade biogas CO₂ into green methanol at Aabenraa Kassø, Denmark.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d7a5f'/%3E%3Cpath d='M18 4 8 18h7l-1 10 10-14h-7z' fill='%23fff'/%3E%3C/svg%3E">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar" id="top">
+  <div class="topbar-inner">
+    <a class="brand" href="#top" aria-label="Green Methanol Power-to-X, back to top">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13.5 2 5 13.5h6L10 22l9-12h-6z"/></svg></span>
+      <span class="brand-text">Green Methanol <span class="brand-sub">Power-to-X</span></span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#overview">Overview</a>
+      <a href="#process">Process</a>
+      <a href="#balance">Energy balance</a>
+      <a href="#solar">Solar</a>
+      <a href="#wind">Wind</a>
+      <a href="#sites">Sites</a>
+      <a href="#economics">Economics</a>
+      <a href="#method">Method</a>
+    </nav>
+    <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch colour theme" title="Switch colour theme">
+      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============================================================ OVERVIEW -->
+<section class="hero" id="overview">
+  <div class="wrap">
+    <p class="eyebrow">Power-to-X · Aabenraa Kassø, Denmark · 55.03° N, 9.28° E · simulation year 2023</p>
+    <h1>Upgrading biogas CO₂ to green methanol with wind &amp; solar powered alkaline electrolysis</h1>
+    <p class="lead">An hourly simulation of a co-located 304&nbsp;MW solar farm and 20-turbine wind farm feeding a 53&nbsp;MW alkaline electrolyser and methanol synthesis plant — with the full energy balance, grid interaction, site comparison and levelised cost of methanol. Every chart on this page is computed from the project's model, and the scenario controls let you resize the plant live.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#balance">Open the simulator</a>
+      <a class="btn" href="https://github.com/VeloyFernandes/Upgrading-Biogas-CO2-to-Green-Methanol-via-Wind-Solar-Powered-Alkaline-Electrolysis" rel="noopener">View source on GitHub</a>
+    </div>
+    <div class="kpis" id="heroKpis" aria-label="Baseline results">
+      <div class="kpi"><span class="kpi-label">Renewable generation</span><span class="kpi-value" id="hk-gen">–</span><span class="kpi-note" id="hk-gen-n">per year</span></div>
+      <div class="kpi"><span class="kpi-label"><i class="dot c-solar"></i>Solar farm</span><span class="kpi-value" id="hk-solar">–</span><span class="kpi-note" id="hk-solar-n"></span></div>
+      <div class="kpi"><span class="kpi-label"><i class="dot c-wind"></i>Wind farm</span><span class="kpi-value" id="hk-wind">–</span><span class="kpi-note" id="hk-wind-n"></span></div>
+      <div class="kpi"><span class="kpi-label">Plant demand</span><span class="kpi-value" id="hk-cons">–</span><span class="kpi-note" id="hk-cons-n"></span></div>
+      <div class="kpi"><span class="kpi-label">Green methanol</span><span class="kpi-value" id="hk-meoh">–</span><span class="kpi-note" id="hk-meoh-n"></span></div>
+      <div class="kpi"><span class="kpi-label">Levelised cost of methanol</span><span class="kpi-value" id="hk-lcom">–</span><span class="kpi-note">base case, 30-year lifetime</span></div>
+    </div>
+    <p class="fineprint">Baseline figures follow the project notebook: solar output uses a clear-sky irradiance model (an upper bound), wind uses NASA POWER 2023 reanalysis. Switch the solar basis to measured all-sky irradiance in the <a href="#balance">simulator</a> to see the difference.</p>
+  </div>
+</section>
+
+<!-- ============================================================ PROCESS -->
+<section id="process" class="section">
+  <div class="wrap">
+    <header class="section-head">
+      <h2>From wind, sun and biogas CO₂ to methanol</h2>
+      <p>Renewable electricity splits water in an alkaline electrolyser. The hydrogen is combined with biogenic CO₂ separated during biogas upgrading and synthesised to methanol. Mass flows below follow the current <a href="#balance">scenario</a>.</p>
+    </header>
+
+    <div class="flow" id="flow">
+      <div class="flow-col">
+        <article class="node n-solar">
+          <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Solar farm</h3>
+          <p class="node-val" id="fl-solar">–</p>
+          <p class="node-sub" id="fl-solar-s">–</p>
+        </article>
+        <article class="node n-wind">
+          <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 11V3c2.5 1.5 3.5 4.5 2 8M12 11l-6.9 4c-.1-2.9 2-5.3 5.9-5.6M12 11l6.9 4c-2.5 1.5-5.6.9-7.9-2.3M12 12.5V22"/></svg>Wind farm</h3>
+          <p class="node-val" id="fl-wind">–</p>
+          <p class="node-sub" id="fl-wind-s">–</p>
+        </article>
+        <article class="node n-grid">
+          <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l3 18M9 3 6 21M7.5 12h9M8.3 7.5h7.4M6.7 16.5h10.6"/></svg>Grid exchange</h3>
+          <p class="node-val" id="fl-grid">–</p>
+          <p class="node-sub" id="fl-grid-s">–</p>
+        </article>
+      </div>
+      <div class="flow-arrow" aria-hidden="true"><span>electricity</span></div>
+      <div class="flow-col">
+        <article class="node n-el">
+          <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3.5 4.2 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2-5.8 5.5-10z"/><path d="M12.8 10.5 10.5 14h3l-2.3 3.5"/></svg>Alkaline electrolyser</h3>
+          <p class="node-val" id="fl-el">–</p>
+          <p class="node-sub" id="fl-el-s">–</p>
+          <ul class="io">
+            <li><span>Water in</span><b id="fl-h2o-in">–</b></li>
+            <li><span>Oxygen out</span><b id="fl-o2">–</b></li>
+          </ul>
+          <p class="eq">2&nbsp;H₂O → 2&nbsp;H₂ + O₂</p>
+        </article>
+      </div>
+      <div class="flow-arrow" aria-hidden="true"><span id="fl-h2-arrow">hydrogen</span></div>
+      <div class="flow-col">
+        <article class="node n-syn">
+          <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3M7.5 15h9"/></svg>Methanol synthesis</h3>
+          <p class="node-val" id="fl-syn">–</p>
+          <p class="node-sub" id="fl-syn-s">–</p>
+          <ul class="io">
+            <li><span>Biogas CO₂ in</span><b id="fl-co2">–</b></li>
+            <li><span>Water out</span><b id="fl-h2o-out">–</b></li>
+          </ul>
+          <p class="eq">CO₂ + 3&nbsp;H₂ → CH₃OH + H₂O</p>
+        </article>
+      </div>
+      <div class="flow-arrow" aria-hidden="true"><span>product</span></div>
+      <div class="flow-col">
+        <article class="node n-prod">
+          <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h14v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2zM8 9V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3M5 14h14"/></svg>Green methanol</h3>
+          <p class="node-val" id="fl-meoh">–</p>
+          <p class="node-sub" id="fl-meoh-s">–</p>
+          <ul class="io">
+            <li><span>CO₂ utilised</span><b id="fl-co2-b">–</b></li>
+            <li><span>Electricity per tonne</span><b id="fl-spec">–</b></li>
+          </ul>
+        </article>
+      </div>
+    </div>
+
+    <div class="cards three">
+      <article class="card">
+        <h3>Why biogas CO₂?</h3>
+        <p>Raw biogas is roughly 40&nbsp;% CO₂. Upgrading it to biomethane already separates that CO₂ as a concentrated, biogenic stream — a ready carbon source that would otherwise be vented.</p>
+      </article>
+      <article class="card">
+        <h3>Why alkaline electrolysis?</h3>
+        <p>Alkaline electrolysers are the most mature and lowest-cost water-splitting technology at the tens-of-megawatts scale, and they tolerate the steady, grid-backed operation assumed in this study.</p>
+      </article>
+      <article class="card">
+        <h3>Why wind and solar together?</h3>
+        <p>In Denmark solar peaks in summer and wind in winter. Co-locating them flattens the seasonal profile and cuts the energy that has to be traded with the grid — see <a href="#wind">seasonal complementarity</a>.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ BALANCE / SIMULATOR -->
+<section id="balance" class="section alt">
+  <div class="wrap">
+    <header class="section-head">
+      <h2>Energy balance &amp; scenario simulator</h2>
+      <p>Hourly generation minus the constant demand of the electrolyser and methanol plant. A positive balance is exported to the grid, a negative one is imported. Change the plant below — every figure and chart in this section, the process flows above and the scenario link in <a href="#economics">Economics</a> update instantly.</p>
+    </header>
+
+    <div class="sim">
+      <aside class="panel controls" aria-label="Scenario controls">
+        <div class="panel-head">
+          <h3>Scenario</h3>
+          <button class="btn small" id="resetScenario" type="button">Reset to baseline</button>
+        </div>
+
+        <fieldset class="seg-field">
+          <legend>Solar irradiance basis</legend>
+          <div class="seg" role="radiogroup" aria-label="Solar irradiance basis">
+            <label><input type="radio" name="solarBasis" value="clear" checked><span>Clear sky</span></label>
+            <label><input type="radio" name="solarBasis" value="allsky"><span>All-sky 2023</span></label>
+          </div>
+          <p class="hint" id="basisHint"></p>
+        </fieldset>
+
+        <div class="ctl"><label for="c-solarDcMw">Solar farm capacity</label><output id="o-solarDcMw"></output>
+          <input type="range" id="c-solarDcMw" min="0" max="800" step="2"></div>
+        <div class="ctl"><label for="c-turbines">Wind turbines <small>(V90 / 3 MW)</small></label><output id="o-turbines"></output>
+          <input type="range" id="c-turbines" min="0" max="80" step="1"></div>
+        <div class="ctl"><label for="c-electrolyzerMw">Electrolyser power</label><output id="o-electrolyzerMw"></output>
+          <input type="range" id="c-electrolyzerMw" min="0" max="200" step="1"></div>
+        <div class="ctl"><label for="c-methanolMw">Methanol plant power</label><output id="o-methanolMw"></output>
+          <input type="range" id="c-methanolMw" min="0" max="10" step="0.1"></div>
+        <div class="ctl"><label for="c-uptime">Operational uptime</label><output id="o-uptime"></output>
+          <input type="range" id="c-uptime" min="50" max="100" step="1"></div>
+        <div class="ctl"><label for="c-h2KwhPerKg">Electrolyser consumption</label><output id="o-h2KwhPerKg"></output>
+          <input type="range" id="c-h2KwhPerKg" min="45" max="65" step="0.1"></div>
+
+        <p class="hint">Solar and wind output scale linearly with installed capacity; wake losses are kept at the 20-turbine layout's level. The plant draws constant power, as in the notebook.</p>
+        <button class="btn small" id="downloadCsv" type="button">Download hourly balance (CSV)</button>
+      </aside>
+
+      <div class="sim-main">
+        <div class="kpis compact" aria-live="polite">
+          <div class="kpi"><span class="kpi-label">Generation</span><span class="kpi-value" id="k-gen">–</span><span class="kpi-note" id="k-gen-n"></span></div>
+          <div class="kpi"><span class="kpi-label">Demand</span><span class="kpi-value" id="k-cons">–</span><span class="kpi-note" id="k-cons-n"></span></div>
+          <div class="kpi"><span class="kpi-label">Net balance</span><span class="kpi-value" id="k-net">–</span><span class="kpi-note" id="k-net-n"></span></div>
+          <div class="kpi"><span class="kpi-label"><i class="dot c-surplus"></i>Grid export</span><span class="kpi-value" id="k-exp">–</span><span class="kpi-note" id="k-exp-n"></span></div>
+          <div class="kpi"><span class="kpi-label"><i class="dot c-deficit"></i>Grid import</span><span class="kpi-value" id="k-imp">–</span><span class="kpi-note" id="k-imp-n"></span></div>
+          <div class="kpi"><span class="kpi-label">Self-sufficiency</span><span class="kpi-value" id="k-self">–</span><span class="kpi-note">of demand met directly</span></div>
+          <div class="kpi"><span class="kpi-label">Hydrogen</span><span class="kpi-value" id="k-h2">–</span><span class="kpi-note">per year</span></div>
+          <div class="kpi"><span class="kpi-label">Methanol</span><span class="kpi-value" id="k-meoh">–</span><span class="kpi-note" id="k-meoh-n"></span></div>
+        </div>
+
+        <figure class="panel chart-card">
+          <figcaption>
+            <div><h3>Generation, demand and net balance</h3><p id="balanceSub">Drag the slider or scroll to zoom.</p></div>
+            <div class="seg small" role="radiogroup" aria-label="Time resolution" data-seg="balanceRes">
+              <label><input type="radio" name="balanceRes" value="hour"><span>Hourly</span></label>
+              <label><input type="radio" name="balanceRes" value="day" checked><span>Daily</span></label>
+              <label><input type="radio" name="balanceRes" value="week"><span>Weekly</span></label>
+              <label><input type="radio" name="balanceRes" value="month"><span>Monthly</span></label>
+            </div>
+          </figcaption>
+          <div class="chart tall" id="ch-balance" role="img" aria-label="Stacked solar and wind generation against plant demand, with the net balance below"></div>
+        </figure>
+      </div>
+    </div>
+
+    <div class="grid two">
+      <figure class="panel chart-card">
+        <figcaption><div><h3>Monthly generation vs demand</h3><p>Stacked by source and by consumer, MWh per month.</p></div></figcaption>
+        <div class="chart" id="ch-monthly" role="img" aria-label="Monthly solar and wind generation next to electrolyser and methanol plant consumption"></div>
+      </figure>
+      <figure class="panel chart-card">
+        <figcaption><div><h3>Net power duration curve</h3><p>Hours of the year sorted from largest surplus to largest deficit.</p></div></figcaption>
+        <div class="chart" id="ch-duration" role="img" aria-label="Duration curve of the hourly net power"></div>
+      </figure>
+    </div>
+
+    <figure class="panel chart-card">
+      <figcaption><div><h3>When does the plant lean on the grid?</h3><p>Net power for every hour of the year — day of year across, hour of day down. Green is surplus exported, red is deficit imported.</p></div></figcaption>
+      <div class="chart" id="ch-heat" role="img" aria-label="Heat map of net power by day of year and hour of day"></div>
+    </figure>
+
+    <figure class="panel chart-card">
+      <figcaption><div><h3>Monthly energy balance table</h3><p>The same table the notebook prints, for the current scenario (MWh).</p></div></figcaption>
+      <div class="table-wrap"><table class="data" id="monthlyTable"></table></div>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================================================ SOLAR -->
+<section id="solar" class="section">
+  <div class="wrap">
+    <header class="section-head">
+      <h2>Solar farm</h2>
+      <p>Modelled with pvlib: Sandia module and CEC inverter models from the SAM database, SAPM cell temperature, fixed tilt facing south. The string layout is sized from the inverter's voltage window and a 1.25 DC/AC ratio, then one inverter block is simulated at one-minute steps and scaled to the farm.</p>
+    </header>
+
+    <div class="grid sidebar">
+      <div class="panel spec">
+        <h3>System design</h3>
+        <dl id="solarSpec"></dl>
+      </div>
+      <figure class="panel chart-card">
+        <figcaption><div><h3>Solar farm output through the year</h3><p>Daily AC energy of the 304 MW farm: clear-sky model against 2023 all-sky irradiance.</p></div></figcaption>
+        <div class="chart" id="ch-solar" role="img" aria-label="Daily solar farm energy, clear sky versus all-sky"></div>
+      </figure>
+    </div>
+
+    <div class="grid two">
+      <figure class="panel chart-card">
+        <figcaption><div><h3>Irradiance at the site</h3><p>Hourly clear-sky components and measured-weather global irradiance. Zoom out for the full year.</p></div></figcaption>
+        <div class="chart" id="ch-irr" role="img" aria-label="Clear-sky GHI, DNI and DHI with all-sky GHI"></div>
+      </figure>
+      <figure class="panel chart-card">
+        <figcaption><div><h3>Tilt and azimuth sensitivity</h3><p>Annual clear-sky yield for 703 panel orientations. The design point sits on the optimum.</p></div></figcaption>
+        <div class="chart" id="ch-tilt" role="img" aria-label="Heat map of annual solar yield by panel tilt and azimuth"></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ WIND -->
+<section id="wind" class="section alt">
+  <div class="wrap">
+    <header class="section-head">
+      <h2>Wind farm</h2>
+      <p>Modelled with windpowerlib from hourly NASA POWER data: wind speed extrapolated from 50&nbsp;m to the 130&nbsp;m hub with an hour-by-hour shear exponent, air-density correction, power-curve smoothing and Jensen wake losses for 20 turbines on a ring layout.</p>
+    </header>
+
+    <div class="grid sidebar">
+      <div class="panel spec">
+        <h3>Wind farm design</h3>
+        <dl id="windSpec"></dl>
+      </div>
+      <figure class="panel chart-card">
+        <figcaption>
+          <div><h3>Wind farm power output</h3><p id="windSub">Mean output with the min–max range in each period.</p></div>
+          <div class="seg small" role="radiogroup" aria-label="Time resolution" data-seg="windRes">
+            <label><input type="radio" name="windRes" value="hour"><span>Hourly</span></label>
+            <label><input type="radio" name="windRes" value="day" checked><span>Daily</span></label>
+            <label><input type="radio" name="windRes" value="week"><span>Weekly</span></label>
+            <label><input type="radio" name="windRes" value="month"><span>Monthly</span></label>
+          </div>
+        </figcaption>
+        <div class="chart" id="ch-wind" role="img" aria-label="Wind farm power output over the year"></div>
+      </figure>
+    </div>
+
+    <div class="grid three">
+      <figure class="panel chart-card">
+        <figcaption><div><h3>Power curve</h3><p>Vestas V90/3000, scaled to 20 turbines.</p></div></figcaption>
+        <div class="chart short" id="ch-pc" role="img" aria-label="Wind farm power curve"></div>
+      </figure>
+      <figure class="panel chart-card">
+        <figcaption><div><h3>Wind speed distribution</h3><p id="weibullSub">Hub-height wind speed with Weibull fit.</p></div></figcaption>
+        <div class="chart short" id="ch-weibull" role="img" aria-label="Histogram of hub-height wind speed with fitted Weibull distribution"></div>
+      </figure>
+      <figure class="panel chart-card">
+        <figcaption><div><h3>Wind rose</h3><p>Share of hours by direction and speed at 130 m.</p></div></figcaption>
+        <div class="chart short" id="ch-rose" role="img" aria-label="Wind rose with 16 direction sectors"></div>
+      </figure>
+    </div>
+
+    <div class="grid two">
+      <figure class="panel chart-card">
+        <figcaption><div><h3>Monthly output distribution</h3><p>Share of hours each month spent in six output bands.</p></div></figcaption>
+        <div class="chart" id="ch-wdist" role="img" aria-label="Share of hours per month in each wind farm output band"></div>
+      </figure>
+      <figure class="panel chart-card">
+        <figcaption><div><h3>Seasonal complementarity</h3><p>Average monthly power of the solar and wind farms in the current scenario.</p></div></figcaption>
+        <div class="chart" id="ch-season" role="img" aria-label="Average monthly solar and wind power"></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ SITES -->
+<section id="sites" class="section">
+  <div class="wrap">
+    <header class="section-head">
+      <h2>How does the site compare across Denmark?</h2>
+      <p>The same solar farm and the same 20-turbine wind farm placed at 31 Danish locations, each simulated with its own 2023 NASA POWER weather. Solar uses measured all-sky irradiance here, so yields are lower than the clear-sky baseline; the wind comparison uses a tighter 7-rotor-diameter layout.</p>
+    </header>
+    <div class="panel chart-card">
+      <div class="figcap">
+        <div><h3 id="mapTitle">Annual yield by location</h3><p id="mapSub"></p></div>
+        <div class="seg small" role="radiogroup" aria-label="Resource" data-seg="geoMode">
+          <label><input type="radio" name="geoMode" value="solar" checked><span>Solar</span></label>
+          <label><input type="radio" name="geoMode" value="wind"><span>Wind</span></label>
+          <label><input type="radio" name="geoMode" value="total"><span>Combined</span></label>
+        </div>
+      </div>
+      <div class="grid map-grid">
+        <div class="chart map" id="ch-map" role="img" aria-label="Map of Denmark with annual energy yield at 31 locations"></div>
+        <div class="chart rank" id="ch-rank" role="img" aria-label="Locations ranked by annual energy yield"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ ECONOMICS -->
+<section id="economics" class="section alt">
+  <div class="wrap">
+    <header class="section-head">
+      <h2>Levelised cost of methanol</h2>
+      <p>Discounted lifetime cost divided by discounted lifetime production. Electricity is costed at the renewables' LCOE, plus grid imports, minus revenue from exported surplus. Edit any assumption to recompute the base case, the Monte Carlo distribution and the sensitivity tornado.</p>
+    </header>
+
+    <div class="sim">
+      <aside class="panel controls" aria-label="Cost assumptions">
+        <div class="panel-head">
+          <h3>Assumptions</h3>
+          <button class="btn small" id="resetLcom" type="button">Reset</button>
+        </div>
+        <div class="form" id="lcomForm"></div>
+        <button class="btn small" id="useScenario" type="button">Use energy &amp; production from scenario</button>
+        <p class="hint" id="lcomHint">Defaults are the project's techno-economic inputs. CAPEX and OPEX are not rescaled when you pull in a different scenario.</p>
+      </aside>
+
+      <div class="sim-main">
+        <div class="kpis compact" aria-live="polite">
+          <div class="kpi"><span class="kpi-label">Base-case LCOM</span><span class="kpi-value" id="e-base">–</span><span class="kpi-note">EUR per tonne</span></div>
+          <div class="kpi"><span class="kpi-label">Monte Carlo mean</span><span class="kpi-value" id="e-mean">–</span><span class="kpi-note" id="e-mean-n"></span></div>
+          <div class="kpi"><span class="kpi-label">5th – 95th percentile</span><span class="kpi-value" id="e-band">–</span><span class="kpi-note">90 % interval</span></div>
+          <div class="kpi"><span class="kpi-label">Net annual energy cost</span><span class="kpi-value" id="e-energy">–</span><span class="kpi-note" id="e-energy-n"></span></div>
+        </div>
+
+        <div class="grid two">
+          <figure class="panel chart-card">
+            <figcaption><div><h3>What makes up the cost?</h3><p>Base-case LCOM by component, EUR per tonne.</p></div></figcaption>
+            <div class="chart short" id="ch-break" role="img" aria-label="LCOM cost components"></div>
+          </figure>
+          <figure class="panel chart-card">
+            <figcaption><div><h3>Sensitivity tornado</h3><p>LCOM range when one input moves and the rest stay at base.</p></div></figcaption>
+            <div class="chart short" id="ch-tornado" role="img" aria-label="Tornado chart of LCOM sensitivity"></div>
+          </figure>
+        </div>
+        <figure class="panel chart-card">
+          <figcaption><div><h3>Monte Carlo distribution</h3><p id="mcSub"></p></div></figcaption>
+          <div class="chart" id="ch-mc" role="img" aria-label="Histogram of simulated LCOM values"></div>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ METHOD -->
+<section id="method" class="section">
+  <div class="wrap">
+    <header class="section-head">
+      <h2>Method, data and limitations</h2>
+      <p>The website re-runs the project notebook's models and publishes the results as static data; all scenario and cost calculations then happen in your browser.</p>
+    </header>
+
+    <ol class="steps">
+      <li><h3>Solar simulation</h3><p>pvlib <code>ModelChain</code> for one inverter block (18 modules per string × 184 strings), Ineichen clear-sky irradiance at one-minute resolution, 20&nbsp;°C ambient, AC output clipped at the inverter rating and scaled by 323 inverters, then averaged to hours.</p></li>
+      <li><h3>Wind simulation</h3><p>NASA POWER hourly wind speed, direction, temperature and pressure; power-law extrapolation to 130&nbsp;m; windpowerlib <code>TurbineClusterModelChain</code> with barometric density, density-corrected and smoothed power curve, and Jensen wake model.</p></li>
+      <li><h3>Combined table</h3><p>Both series are aligned on an hourly Europe/Copenhagen index for 2023 and merged; gaps are treated as zero generation.</p></li>
+      <li><h3>Energy balance</h3><p>Constant demand of the electrolyser (53&nbsp;MW) and methanol plant (2&nbsp;MW) times a 92&nbsp;% uptime factor is subtracted hour by hour. Surplus is exported, deficit imported.</p></li>
+      <li><h3>Site &amp; orientation studies</h3><p>31 Danish locations are simulated with local all-sky irradiance and wind data; 703 tilt/azimuth combinations are simulated for the project site.</p></li>
+      <li><h3>Cost of methanol</h3><p>30-year discounted cash flow at 5&nbsp;%, 0.3&nbsp;% annual production degradation, with a 5,000-run Monte Carlo on electricity cost and prices and a one-at-a-time tornado analysis.</p></li>
+    </ol>
+
+    <div class="cards two">
+      <article class="card">
+        <h3>Limitations to keep in mind</h3>
+        <ul>
+          <li>The baseline solar yield is a <strong>clear-sky upper bound</strong>. With 2023 all-sky irradiance the same farm produces roughly a third less — use the simulator's basis switch to compare.</li>
+          <li>The plant is modelled as a constant load backed by the grid; electrolyser part-load behaviour, ramping, storage and hydrogen buffering are not modelled.</li>
+          <li>Hydrogen and methanol quantities on this page come from stoichiometry and an adjustable electrolyser consumption (default 50.9&nbsp;kWh/kg H₂, which reproduces the project's 44,439&nbsp;t/yr). Synthesis losses are not modelled.</li>
+          <li>The cost model's energy, export and import defaults are the project's fixed inputs and are independent of the hourly balance unless you link them to the scenario.</li>
+          <li>Scenario scaling is linear in capacity; a different turbine count would change wake losses in reality.</li>
+          <li>Re-running the notebook with current library versions gives a clear-sky solar yield about 0.1&nbsp;% below the originally reported 582,338&nbsp;MWh; the wind yield matches exactly.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Data and software</h3>
+        <ul>
+          <li><strong>NASA POWER</strong> — hourly meteorology and irradiance, NASA Langley Research Center POWER Project.</li>
+          <li><strong>pvlib python</strong> — Holmgren, Hansen &amp; Mikofski (2018), <em>JOSS</em> 3(29), 884.</li>
+          <li><strong>windpowerlib</strong> — Krien, Lenck, Schönfeldt &amp; Reinert (2019), <em>JOSS</em> 4(36), 1157.</li>
+          <li><strong>SAM component databases</strong> — NREL System Advisor Model modules and inverters.</li>
+          <li><strong>Map outline</strong> — Natural Earth 1:10m; charts drawn with Apache ECharts.</li>
+        </ul>
+        <p class="hint" id="dataStamp"></p>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div>
+      <strong>Upgrading Biogas CO₂ to Green Methanol via Wind &amp; Solar-Powered Alkaline Electrolysis</strong>
+      <p>Aung Kyawo · <a href="https://veloyfernandes.github.io/">Veloy Fernandes</a> · Denizhan Arslanbeka</p>
+    </div>
+    <div class="footer-links">
+      <a href="https://veloyfernandes.github.io/">veloyfernandes.github.io</a>
+      <a href="https://github.com/VeloyFernandes/Upgrading-Biogas-CO2-to-Green-Methanol-via-Wind-Solar-Powered-Alkaline-Electrolysis" rel="noopener">GitHub repository</a>
+      <a href="https://github.com/VeloyFernandes/Upgrading-Biogas-CO2-to-Green-Methanol-via-Wind-Solar-Powered-Alkaline-Electrolysis/blob/main/Wind_Solar_v24.ipynb" rel="noopener">Notebook</a>
+      <span>MIT License</span>
+    </div>
+  </div>
+</footer>
+
+<noscript><p class="noscript">This page needs JavaScript to draw its charts and run the simulator.</p></noscript>
+
+<script src="vendor/echarts.min.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/map.js"></script>
+<script src="assets/model.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
